@@ -10,6 +10,7 @@ from flask import (
 )
 from transformers import pipeline
 from docx import Document
+import torch
 
 # ─── Load .env (for TEMPLATES_DIR, GENERATED_DIR, FLASK_ENV) ────────────────
 load_dotenv()
@@ -26,48 +27,49 @@ os.makedirs(GENERATED_DIR, exist_ok=True)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# ─── HuggingFace LLM Pipeline ────────────────────────────────────────────────
+# ─── HuggingFace Pipeline (small CPU model) ─────────────────────────────────
+logger.info("Loading HF pipeline (GPT2, CPU-only)…")
 hf_generator = pipeline(
     "text-generation",
-    model="tiiuae/falcon-7b-instruct",  # or "gpt2" for smaller footprint
-    device_map="auto",                  # omit on CPU-only
-    torch_dtype="auto",
+    model="gpt2",
+    device=-1,           # CPU only
+    max_length=200,
+    do_sample=True,
+    top_p=0.9,
+    temperature=0.7,
 )
 
-def call_openai(messages, max_tokens=500):
+def call_openai(messages, max_tokens=200):
     """
-    Free local inference: take the last user message as prompt,
-    generate up to max_tokens additional tokens, return the text.
+    Take only the last user prompt, generate up to max_tokens more tokens,
+    and return the generated text.
     """
     prompt = messages[-1]["content"]
     logger.info("HF prompt: %s", prompt.replace("\n", " / "))
-    output = hf_generator(
+    out = hf_generator(
         prompt,
         max_length=len(prompt.split()) + max_tokens,
-        do_sample=False,
         num_return_sequences=1,
     )
-    return output[0]["generated_text"].strip()
+    # Strip the prompt from the returned text
+    generated = out[0]["generated_text"][len(prompt):].strip()
+    return generated or "🤖 (no response)"
 
 # ─── Routes ───────────────────────────────────────────────────────────────────
 @app.route("/", methods=["GET"])
 def index():
     return render_template("form.html")
 
-
 @app.route("/generate", methods=["POST"])
 def generate():
-    # 1) Gather inputs
     storage = request.form.get("storage_type", "").strip()
     volume  = request.form.get("volume", "").strip()
     days    = request.form.get("days", "").strip()
     wms     = request.form.get("wms", "").strip()
     email   = request.form.get("email", "").strip()
-
     if not (storage and volume and days and wms):
         abort(400, "Missing form fields")
 
-    # 2) Build prompt & call HF LLM
     system_msg = {
         "role": "system",
         "content": (
@@ -79,8 +81,8 @@ def generate():
     user_msg = {
         "role": "user",
         "content": (
-            f"Please draft a quotation for the following:\n"
-            f"- Storage Type: {storage}\n"
+            f"Draft a quotation:\n"
+            f"- Storage: {storage}\n"
             f"- Volume: {volume}\n"
             f"- Duration: {days} days\n"
             f"- Include WMS: {wms}\n"
@@ -89,21 +91,20 @@ def generate():
     }
     quote_text = call_openai([system_msg, user_msg])
 
-    # 3) Pick the right .docx template
+    # Select template
     if "Chemical" in storage:
-        tmpl_name = "Chemical VAS.docx"
+        tmpl = "Chemical VAS.docx"
     elif "Open Yard" in storage:
-        tmpl_name = "Open Yard VAS.docx"
+        tmpl = "Open Yard VAS.docx"
     else:
-        tmpl_name = "Standard VAS.docx"
+        tmpl = "Standard VAS.docx"
 
-    template_path = os.path.join(TEMPLATES_DIR, tmpl_name)
-    if not os.path.isfile(template_path):
-        abort(500, f"Template not found: {tmpl_name}")
+    tpl_path = os.path.join(TEMPLATES_DIR, tmpl)
+    if not os.path.isfile(tpl_path):
+        abort(500, f"Template not found: {tmpl}")
 
-    # 4) Load template, insert AI text, save
-    doc = Document(template_path)
-    doc.add_paragraph("")                     # blank line
+    doc = Document(tpl_path)
+    doc.add_paragraph("")
     doc.add_paragraph("Quotation:", style="Heading 2")
     for line in quote_text.split("\n"):
         doc.add_paragraph(line)
@@ -112,14 +113,12 @@ def generate():
     out_path = os.path.join(GENERATED_DIR, filename)
     doc.save(out_path)
 
-    # 5) Return file
     return send_from_directory(
         GENERATED_DIR,
         filename,
         as_attachment=True,
         download_name=filename
     )
-
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -142,9 +141,8 @@ def chat():
         reply = "Sorry, something went wrong."
     return jsonify({"reply": reply})
 
-
 # ─── Entrypoint ────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    debug_mode = os.getenv("FLASK_ENV", "").lower() == "development"
+    debug = os.getenv("FLASK_ENV", "").lower() == "development"
     port = int(os.getenv("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=debug_mode)
+    app.run(host="0.0.0.0", port=port, debug=debug)
