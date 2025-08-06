@@ -823,7 +823,6 @@ def chat():
 
     if match([r"sub warehouse|m44|m45|al markaz|abu dhabi warehouse total|all warehouses"]):
         return jsonify({"reply": "In addition to the main 21K warehouse, DSV operates sub-warehouses in Abu Dhabi: M44 (5,760 sqm), M45 (5,000 sqm), and Al Markaz (12,000 sqm). Combined with 21K, the total covered warehouse area in Abu Dhabi is approximately 44,000 sqm."})
-
     if match([r"terms and conditions|quotation policy|T&C|billing cycle|operation timing|payment terms|quotation validity"]):
         return jsonify({"reply": "DSV quotations include the following terms: Monthly billing, final settlement before vacating, 15-day quotation validity, subject to space availability. The depot operates Monday–Friday 8:30 AM to 5:30 PM. Insurance is not included by default. An environmental fee of 0.15% is added to all invoices. Non-moving cargo over 3 months may incur extra storage tariff."})
     # --- QHSE ---   
