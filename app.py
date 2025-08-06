@@ -5,25 +5,21 @@ from uuid import uuid4
 
 from dotenv import load_dotenv
 from flask import (
-    Flask,
-    request,
-    render_template,
-    send_from_directory,
-    jsonify,
-    abort,
+    Flask, request, render_template,
+    send_from_directory, jsonify, abort
 )
 import openai
-from openai.error import RateLimitError, OpenAIError
-from docx import Document
 
 # ─── Load .env ────────────────────────────────────────────────────────────────
-load_dotenv()  # loads OPENAI_API_KEY, TEMPLATES_DIR, GENERATED_DIR, FLASK_ENV
+load_dotenv()  # loads OPENAI_API_KEY, TEMPLATES_DIR, GENERATED_DIR, FLASK_ENV, etc.
 
 # ─── Flask & OpenAI Setup ─────────────────────────────────────────────────────
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
+MODEL = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
+
 TEMPLATES_DIR = os.getenv("TEMPLATES_DIR", "templates")
 GENERATED_DIR = os.getenv("GENERATED_DIR", "generated")
 os.makedirs(GENERATED_DIR, exist_ok=True)
@@ -32,54 +28,32 @@ os.makedirs(GENERATED_DIR, exist_ok=True)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
-# ─── OpenAI Helper with Double-Fallback ─────────────────────────────────────────
+# ─── OpenAI Helper ─────────────────────────────────────────────────────────────
 def call_openai(messages, max_tokens=500):
     """
-    Try gpt-4o-mini then gpt-3.5-turbo, or return a friendly error if both fail.
+    Always call the free-tier GPT-3.5-Turbo model.
     """
-    for model in ("gpt-4o-mini", "gpt-3.5-turbo"):
-        try:
-            logger.info(f"Calling OpenAI with model {model}")
-            resp = openai.ChatCompletion.create(
-                model=model,
-                messages=messages,
-                max_tokens=max_tokens,
-            )
-            return resp.choices[0].message.content.strip()
-        except RateLimitError:
-            logger.warning(f"{model} rate/quota limit hit; trying next model")
-        except OpenAIError as e:
-            logger.error(f"{model} API error: {e}")
-        except Exception:
-            logger.exception(f"{model} unexpected error")
-    return (
-        "Sorry, our AI service is unavailable right now. "
-        "Please try again in a few minutes."
+    logger.info(f"Calling OpenAI model={MODEL}")
+    resp = openai.ChatCompletion.create(
+        model=MODEL,
+        messages=messages,
+        max_tokens=max_tokens,
     )
-
+    return resp.choices[0].message.content.strip()
 
 # ─── Routes ────────────────────────────────────────────────────────────────────
 @app.route("/", methods=["GET"])
 def index():
-    """Render the quotation form."""
     return render_template("form.html")
-
 
 @app.route("/generate", methods=["POST"])
 def generate():
-    """
-    1) Read form fields
-    2) Ask OpenAI for a quotation narrative
-    3) Merge into the correct .docx template
-    4) Return the generated .docx as a download
-    """
     # 1) Gather inputs
     storage = request.form.get("storage_type", "").strip()
-    volume = request.form.get("volume", "").strip()
-    days = request.form.get("days", "").strip()
-    wms = request.form.get("wms", "").strip()
-    email = request.form.get("email", "").strip()
+    volume  = request.form.get("volume", "").strip()
+    days    = request.form.get("days", "").strip()
+    wms     = request.form.get("wms", "").strip()
+    email   = request.form.get("email", "").strip()
 
     if not (storage and volume and days and wms):
         abort(400, "Missing form fields")
@@ -91,7 +65,7 @@ def generate():
             "You are an expert logistics quote generator for DSV. "
             "Based on the inputs, produce a clear, concise quotation "
             "including cost breakdown."
-        ),
+        )
     }
     user_msg = {
         "role": "user",
@@ -101,12 +75,12 @@ def generate():
             f"- Volume: {volume}\n"
             f"- Duration: {days} days\n"
             f"- Include WMS: {wms}\n"
-            + (f"- Email: {email}\n" if email else "")
-        ),
+            f"{('- Email: '+email) if email else ''}"
+        )
     }
     quote_text = call_openai([system_msg, user_msg])
 
-    # 3) Pick the right template file
+    # 3) Pick the right template
     if "Chemical" in storage:
         tmpl_name = "Chemical VAS.docx"
     elif "Open Yard" in storage:
@@ -118,7 +92,8 @@ def generate():
     if not os.path.isfile(template_path):
         abort(500, f"Template not found: {tmpl_name}")
 
-    # 4) Load, insert quote, save
+    # 4) Load template, insert AI text, save
+    from docx import Document
     doc = Document(template_path)
     doc.add_paragraph("")  # blank line
     doc.add_paragraph("Quotation:", style="Heading 2")
@@ -134,31 +109,29 @@ def generate():
         GENERATED_DIR,
         filename,
         as_attachment=True,
-        download_name=filename,
+        download_name=filename
     )
-
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    """
-    JSON { message: "..." } → JSON { reply: "..." }
-    """
     payload = request.get_json(force=True)
     user_text = (payload.get("message") or "").strip()
     if not user_text:
         return jsonify({"reply": "Please type something first."})
 
     logger.info("Chat request: %s", user_text)
-
     sys_msg = {
         "role": "system",
-        "content": "You are a helpful assistant for DSV Quotation Generator.",
+        "content": "You are a helpful assistant for DSV Quotation Generator."
     }
     usr_msg = {"role": "user", "content": user_text}
 
-    reply = call_openai([sys_msg, usr_msg])
+    try:
+        reply = call_openai([sys_msg, usr_msg])
+    except Exception as e:
+        logger.error("OpenAI error: %s", e, exc_info=True)
+        reply = "Sorry, something went wrong."
     return jsonify({"reply": reply})
-
 
 # ─── Entrypoint ────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
