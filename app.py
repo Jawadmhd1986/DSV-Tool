@@ -1,93 +1,90 @@
-import os, time, logging
+import os
+import time
+import logging
 from uuid import uuid4
+
 from dotenv import load_dotenv
 from flask import Flask, request, render_template, send_from_directory, jsonify, abort
-from huggingface_hub import InferenceClient
+from huggingface_hub import InferenceApi
 from docx import Document
 
-# ─── Load .env ────────────────────────────────────────────────────────────────
-load_dotenv()  # reads TEMPLATES_DIR, GENERATED_DIR, FLASK_ENV, HF_API_TOKEN
+# ─── Load environment ─────────────────────────────────────────────────────────
+load_dotenv()  # reads HF_API_TOKEN, HF_MODEL, TEMPLATES_DIR, GENERATED_DIR, FLASK_ENV
 
-# ─── Flask Setup ─────────────────────────────────────────────────────────────
+# ─── Flask setup ──────────────────────────────────────────────────────────────
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
-
-TEMPLATES_DIR = os.getenv("TEMPLATES_DIR", "templates")
-GENERATED_DIR = os.getenv("GENERATED_DIR", "generated")
-os.makedirs(GENERATED_DIR, exist_ok=True)
 
 # ─── Logging ───────────────────────────────────────────────────────────────────
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# ─── Hugging Face Inference Client ────────────────────────────────────────────
-HF_API_TOKEN = os.getenv("HF_API_TOKEN")
-if not HF_API_TOKEN:
-    logger.error("Missing HF_API_TOKEN in env!")
-hf = InferenceClient(token=HF_API_TOKEN)
+# ─── Directories ───────────────────────────────────────────────────────────────
+TEMPLATES_DIR = os.getenv("TEMPLATES_DIR", "templates")
+GENERATED_DIR = os.getenv("GENERATED_DIR", "generated")
+os.makedirs(GENERATED_DIR, exist_ok=True)
 
-def call_llm(messages, max_tokens=500):
+# ─── Hugging Face Inference API ───────────────────────────────────────────────
+HF_TOKEN = os.getenv("HF_API_TOKEN")
+HF_MODEL = os.getenv("HF_MODEL", "gpt2")
+hf = InferenceApi(repo_id=HF_MODEL, token=HF_TOKEN)
+
+def call_ai(prompt: str, max_new_tokens: int = 200) -> str:
     """
-    Calls the hosted HF Falcon-7B-Instruct (or any pipeline) over the Inference API.
+    Send `prompt` to HF Inference, return the generated text.
     """
-    prompt = messages[-1]["content"]
     logger.info("HF prompt: %s", prompt.replace("\n", " / "))
-    # adjust model name if you want a different one:
-    resp = hf.text_generation(
-        model="tiiuae/falcon-7b-instruct",
-        inputs=prompt,
-        parameters={"max_new_tokens": max_tokens}
-    )
-    return resp.generated_text.strip()
+    # HF InferenceApi expects the inputs and a parameters dict
+    response = hf(inputs=prompt, parameters={"max_new_tokens": max_new_tokens})
+    # response is typically a list of dicts with 'generated_text'
+    text = response[0].get("generated_text", "").strip()
+    return text
 
 # ─── Routes ────────────────────────────────────────────────────────────────────
 @app.route("/", methods=["GET"])
 def index():
     return render_template("form.html")
 
+
 @app.route("/generate", methods=["POST"])
 def generate():
-    storage = request.form.get("storage_type","").strip()
-    volume  = request.form.get("volume","").strip()
-    days    = request.form.get("days","").strip()
-    wms     = request.form.get("wms","").strip()
-    email   = request.form.get("email","").strip()
+    # 1) Gather inputs
+    storage = request.form.get("storage_type", "").strip()
+    volume  = request.form.get("volume", "").strip()
+    days    = request.form.get("days", "").strip()
+    wms     = request.form.get("wms", "").strip()
+    email   = request.form.get("email", "").strip()
+
     if not (storage and volume and days and wms):
         abort(400, "Missing form fields")
 
-    system_msg = {
-        "role":"system",
-        "content":(
-            "You are an expert logistics quote generator for DSV. "
-            "Based on the inputs, produce a clear, concise quotation including cost breakdown."
-        )
-    }
-    user_msg = {
-        "role":"user",
-        "content":(
-            f"Please draft a quotation for the following:\n"
-            f"- Storage Type: {storage}\n"
-            f"- Volume: {volume}\n"
-            f"- Duration: {days} days\n"
-            f"- Include WMS: {wms}\n"
-            + (f"- Email: {email}\n" if email else "")
-        )
-    }
-    quote_text = call_llm([system_msg, user_msg])
+    # 2) Build prompt & call the HF model
+    prompt = (
+        "You are an expert logistics quote generator for DSV. "
+        "Based on the inputs, produce a clear, concise quotation including cost breakdown.\n\n"
+        f"- Storage Type: {storage}\n"
+        f"- Volume: {volume}\n"
+        f"- Duration: {days} days\n"
+        f"- Include WMS: {wms}\n"
+        + (f"- Email: {email}\n" if email else "")
+    )
+    quote_text = call_ai(prompt, max_new_tokens=300)
 
-    # pick template
+    # 3) Pick the correct .docx template
     if "Chemical" in storage:
-        tmpl = "Chemical VAS.docx"
+        tmpl_name = "Chemical VAS.docx"
     elif "Open Yard" in storage:
-        tmpl = "Open Yard VAS.docx"
+        tmpl_name = "Open Yard VAS.docx"
     else:
-        tmpl = "Standard VAS.docx"
-    tpl_path = os.path.join(TEMPLATES_DIR, tmpl)
-    if not os.path.isfile(tpl_path):
-        abort(500, f"Template not found: {tmpl}")
+        tmpl_name = "Standard VAS.docx"
 
-    doc = Document(tpl_path)
-    doc.add_paragraph("")  # blank
+    template_path = os.path.join(TEMPLATES_DIR, tmpl_name)
+    if not os.path.isfile(template_path):
+        abort(500, f"Template not found: {tmpl_name}")
+
+    # 4) Load, insert AI text, save
+    doc = Document(template_path)
+    doc.add_paragraph("")  # blank line
     doc.add_paragraph("Quotation:", style="Heading 2")
     for line in quote_text.split("\n"):
         doc.add_paragraph(line)
@@ -96,34 +93,30 @@ def generate():
     out_path = os.path.join(GENERATED_DIR, filename)
     doc.save(out_path)
 
+    # 5) Serve the file download
     return send_from_directory(
-        GENERATED_DIR, filename,
-        as_attachment=True, download_name=filename
+        GENERATED_DIR,
+        filename,
+        as_attachment=True,
+        download_name=filename
     )
+
 
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.get_json(force=True)
     user_text = (data.get("message") or "").strip()
     if not user_text:
-        return jsonify({"reply":"Please type something first."})
+        return jsonify({"reply": "Please type something first."})
 
     logger.info("Chat request: %s", user_text)
-    sys_msg = {
-        "role":"system",
-        "content":"You are a helpful assistant for DSV Quotation Generator."
-    }
-    usr_msg = {"role":"user","content":user_text}
+    # We reuse the same HF pipeline for freeform chat
+    reply = call_ai(user_text, max_new_tokens=150)
+    return jsonify({"reply": reply})
 
-    try:
-        reply = call_llm([sys_msg, usr_msg])
-    except Exception as e:
-        logger.error("HF error: %s", e, exc_info=True)
-        reply = "Sorry, something went wrong."
-    return jsonify({"reply":reply})
 
 # ─── Entrypoint ────────────────────────────────────────────────────────────────
-if __name__=="__main__":
-    debug = os.getenv("FLASK_ENV","").lower()=="development"
-    port  = int(os.getenv("PORT",5000))
+if __name__ == "__main__":
+    debug = os.getenv("FLASK_ENV", "").lower() == "development"
+    port = int(os.getenv("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=debug)
