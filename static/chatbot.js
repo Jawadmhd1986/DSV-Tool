@@ -1,3 +1,14 @@
+// 🔧 Fix for mobile viewport height (ensures chat icon appears on load)
+window.addEventListener('load', () => {
+  let vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+});
+window.addEventListener('resize', () => {
+  let vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+});
+
+// 🧠 Main chatbot logic
 document.addEventListener('DOMContentLoaded', () => {
   const chatBox    = document.getElementById('chat-box');
   const chatToggle = document.querySelector('.chat-toggle');
