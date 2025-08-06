@@ -14,7 +14,7 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: var(--grey-bg);
-  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100); /* 👈 fix mobile 100vh bug */
   overflow: hidden;
 }
 
@@ -208,7 +208,7 @@ body {
 @media (max-width: 480px) {
   .dsv-logo {
     width: 120px;
-    top: 3rem;
+    top: 1.7rem;
   }
   .quote-card {
     padding: 3rem 1rem 0.75rem;
@@ -231,3 +231,6 @@ body {
     z-index: 2000;
   }
 }
+
+
+
