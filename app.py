@@ -1187,8 +1187,7 @@ def chat():
         return jsonify({"reply":
         "📍 **DSV Abu Dhabi Location:**\n"
         "M-19, Mussafah Industrial Area, Abu Dhabi, UAE\n"
-        "📞 +971 2 555 2900\n\n"
-        "🗺️ Google Maps: https://goo.gl/maps/tnFcmydbvdJ9gGLy8"})
+        "📞 +971 2 555 2900"})
 
     # --- Friendly Chat ---
     if match([r"\bhello\b|\bhi\b|\bhey\b|good morning|good evening"]):
