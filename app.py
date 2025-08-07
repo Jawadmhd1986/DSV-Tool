@@ -150,6 +150,10 @@ def chat():
         text = re.sub(r"\bpls\b", "please", text)
         text = re.sub(r"\bthx\b", "thanks", text)
         text = re.sub(r"\binfo\b", "information", text)
+        text = re.sub(r"\bhru\b", "how are you", text)
+        text = re.sub(r"\bh\s*r\s*u\b", "how are you", text)
+        text = re.sub(r"how\s*u\s*doing", "how are you", text)
+        text = re.sub(r"how\s*r\s*u", "how are you", text)
 
     # Logistics & warehouse short forms
         text = re.sub(r"\bwh\b", "warehouse", text)
@@ -212,12 +216,15 @@ def chat():
 
     def match(patterns):
         return any(re.search(p, message) for p in patterns)
-        
+    
+    if match([r"\bwarehouse\b", r"\bwarehousing\b", r"warehouse info", r"tell me about warehouse", r"warehouse?"]):
+        return jsonify({"reply": "Can you clarify what aspect of the warehouse you're asking about? We can help with:\n- 📦 Warehouse size or layout\n- ❄️ Temperature zones (ambient, cold, freezer)\n- 🏗 Racking & pallet types\n- 🛠️ Warehouse services or processes\n- 🧑‍🏭 Training & QHSE\n\nLet me know which part you're interested in."})
+    
 # --- Containers (All Types + Flexible Unit Recognition) ---
     if match([r"healthcare|medical storage|pharma warehouse|pharma|pharmaceutical storage"]):
         return jsonify({"reply": "DSV serves healthcare clients via temperature-controlled, GDP-compliant storage at Abu Dhabi Airport Freezone and Mussafah."})
 
-    if match([r"\bcontainers\b", r"tell me about containers", r"container types", r"types of containers", r"container sizes", r"container dimensions"]):
+    if match([r"\bcontainers?\b", r"tell me about containers?", r"container types", r"types of containers", r"container sizes", r"container dimensions", r"container info", r"container specs"]):
         return jsonify({"reply": "Here are the main container types and their specifications:\n\n📦 **20ft Container**:\n- Length: 6.1m, Width: 2.44m, Height: 2.59m\n- Payload: ~28,000 kg\n- Capacity: ~33 CBM\n\n📦 **40ft Container**:\n- Length: 12.2m, Width: 2.44m, Height: 2.59m\n- Payload: ~30,400 kg\n- Capacity: ~67 CBM\n\n⬆️ **40ft High Cube**:\n- Same as 40ft but height = 2.9m\n- Ideal for voluminous goods\n\n❄️ **Reefer Container (20ft & 40ft)**:\n- Insulated, temperature-controlled (+2°C to –25°C)\n- Used for food, pharma, perishables\n\n🏗 **Open Top Container**:\n- No roof, allows crane loading\n- For tall cargo (e.g. machinery, steel)\n\n🪜 **Flat Rack Container**:\n- No sides or roof\n- Used for oversized loads like vehicles or transformers\n\n📦 **SME Containers**:\n- Custom modular containers used in the UAE for small-scale import/export or temporary storage by SMEs\n\nLet me know if you'd like help choosing the right container for your cargo!"})
 
 # Specific container types with ft/feet/foot flexibility
@@ -404,7 +411,7 @@ def chat():
 # --- Warehouse Area / Size ---
     if match([
     r"\barea\b", r"warehouse area", r"warehouses area", r"warehouse size", r"warehouses size",
-    r"how big.*warehouse", r"storage area",r"facilities",r"warehouses", r"warehouse total sqm", r"warehouse.*dimensions"]):
+    r"how big.*warehouse", r"storage area", r"facilities", r"facility", r"warehouses", r"warehouse total sqm", r"warehouse.*dimensions"]):
         return jsonify({"reply": 
         "DSV Abu Dhabi has approximately **44,000 sqm** of total warehouse space, distributed as follows:\n"
         "- **21K Warehouse (Mussafah)**: 21,000 sqm\n"
@@ -470,14 +477,24 @@ def chat():
 # --- Industry: Oil & Gas ---
     if match([r"oil and gas", r"oil & gas", r"\bo&g\b", r"energy sector", r"oil logistics"]):
         return jsonify({"reply": "DSV supports the **Oil & Gas industry** across Abu Dhabi and the GCC through:\n- Storage of chemicals and DG\n- Heavy equipment transport\n- 3PL/4PL project logistics\n- ADNOC-compliant warehousing and safety\n- Support for offshore & EPC contractors with specialized fleet"})
+    if match([
+    r"heavy lift", r"heavy lift logistics", r"heavy cargo project", r"oversized transport", r"lifting heavy cargo", 
+    r"heavy project cargo", r"lift.*heavy", r"project transport.*heavy", r"transport.*heavy equipment"]):
+        return jsonify({"reply": 
+        "Yes, DSV handles **heavy lift logistics** across the UAE and GCC. We provide:\n\n"
+        "- 🏗 Mobile cranes (up to 80T)\n"
+        "- 🚛 Lowbed trailers for oversized cargo\n"
+        "- 📦 Rigging, lifting, and permit coordination\n"
+        "- 🛣 Route planning for abnormal loads\n"
+        "- 📋 QHSE-compliant execution\n\n"
+        "Examples include transformer lifts, construction machinery, and ADNOC EPC project deliveries."})
 
 # --- Industry: Breakbulk / Heavy Logistics ---
     if match([r"breakbulk", r"break bulk", r"heavy cargo", r"non-containerized cargo"]):
         return jsonify({"reply": "DSV handles **breakbulk and heavy logistics** including:\n- Oversized cargo (machinery, steel, transformers)\n- Lowbed trailer and crane support\n- Project logistics & site delivery\n- DG compliance and route planning\n- Full UAE & GCC transport coordination"})
     if match([r"last mile", r"last mile delivery", r"final mile", r"city delivery"]):
         return jsonify({"reply": "DSV offers **last-mile delivery** services across the UAE using small city trucks and vans. These are ideal for e-commerce, retail, and healthcare shipments requiring fast and secure delivery to final destinations. Deliveries are WMS-tracked and coordinated by our OCC team for full visibility."})
-    if match([r"\binventory\b", r"inventory management", r"what wms syatem dsv use", r"inventory control", r"inventory system", r"stock tracking"]):
-        return jsonify({"reply": "DSV uses INFOR WMS to manage all inventory activities. It provides:\n- Real-time stock visibility\n- Bin-level tracking\n- Batch/serial number control\n- Expiry tracking (for pharma/FMCG)\n- Integration with your ERP system"})
+    
     if match([r"cross dock", r"cross docking", r"cross-dock", r"crossdock facility"]):
         return jsonify({"reply": "Yes, DSV supports **cross-docking** for fast-moving cargo:\n- Receive → Sort → Dispatch (no storage)\n- Ideal for FMCG, e-commerce, and retail\n- Reduces lead time and handling\n- Available at Mussafah and KIZAD hubs"})
     if match([r"transit store", r"transit warehouse", r"transit storage", r"temporary storage", r"short term storage"]):
@@ -494,6 +511,13 @@ def chat():
     # --- What is WMS ---
     if match([r"what is wms|wms meaning|warehouse management system"]):
         return jsonify({"reply": "WMS stands for Warehouse Management System. DSV uses INFOR WMS for inventory control, inbound/outbound, and full visibility."})
+    if match([r"\binventory\b", r"inventory management", r"what wms system dsv use", r"inventory control", r"inventory system", r"stock tracking"]):
+        return jsonify({"reply": "DSV uses INFOR WMS to manage all inventory activities. It provides:\n- Real-time stock visibility\n- Bin-level tracking\n- Batch/serial number control\n- Expiry tracking (for pharma/FMCG)\n- Integration with your ERP system"})
+    if match([r"\binfor\b", r"what is infor", r"infor wms", r"who makes wms", r"infor system", r"infor software"]):
+        return jsonify({"reply": 
+        "INFOR is the software provider of the Warehouse Management System (WMS) used by DSV. "
+        "It supports real-time inventory tracking, barcode scanning, inbound/outbound flow, and integration with ERP systems. "
+        "INFOR WMS is known for its scalability, accuracy, and user-friendly interface for warehouse operations."})
 
     # --- Services DSV Provides ---
     if match([
@@ -526,13 +550,22 @@ def chat():
         "- 📍 **KIZAD** – 360,000 sqm open yard\n"
         "- 📍 **Airport Freezone** – GDP-compliant storage for healthcare\n\n"
         "📞 +971 2 555 2900 | 🌐 [dsv.com](https://www.dsv.com)"})
+    if match([r"dsv abu dhabi", r"about dsv abu dhabi", r"who is dsv abu dhabi", r"what is dsv abu dhabi", r"dsv in abu dhabi"]):
+        return jsonify({"reply": 
+        "DSV Abu Dhabi offers full logistics, warehousing, and transport services. Our main operations include:\n\n"
+        "📍 **21K Warehouse (Mussafah)** – 21,000 sqm, 15m height, 7 chambers\n"
+        "📍 **M44 & M45 Sub-warehouses** – 5,760 sqm & 5,000 sqm\n"
+        "📍 **Al Markaz (Hameem)** – 12,000 sqm\n"
+        "📍 **KIZAD Open Yard** – 360,000 sqm\n"
+        "📍 **Airport Freezone** – Pharma & healthcare storage\n\n"
+        "We handle 2PL, 3PL, 4PL logistics, WMS, VAS, and temperature-controlled storage. Contact +971 2 555 2900 or visit [dsv.com](https://www.dsv.com)."})
 
     # --- What does DSV mean ---
-    if not re.search(r"\bwms\b", message) and match([
+    if not re.search(r"(wms|warehouse management|abu dhabi|fleet|transport|facility)", message) and match([
     r"\bdsv\b", r"about dsv", r"who is dsv", r"what is dsv", 
-    r"dsv info", r"dsv abu dhabi", r"tell me about dsv", r"dsv overview", 
+    r"dsv info", r"tell me about dsv", r"dsv overview", 
     r"dsv abbreviation", r"dsv stands for", r"what does dsv mean"]):
-        return jsonify({"reply":
+    return jsonify({"reply":
         "DSV stands for **'De Sammensluttede Vognmænd'**, meaning **'The Consolidated Hauliers'** in Danish. "
         "Founded in 1976, DSV is a global logistics leader operating in over 80 countries."})
 
@@ -731,10 +764,9 @@ def chat():
 
     # --- Transportation---
     if match([
-    r"\bfleet\b", r"dsv.*fleet", r"fleet.*dsv",
-    r"\bdsv transportation\b", r"truck fleet", r"transport fleet", r"fleet info",
-    r"what.*fleet.*dsv", r"dsv.*trucks", r"types of fleet"]):
-        return jsonify({"reply": 
+    r"\bfleet\b", r"dsv fleet", r"dsv transportation", r"truck fleet", r"transport fleet", 
+    r"fleet info", r"fleet of dsv", r"tell me about fleet", r"fleet trucks", r"dsv.*fleet", r"fleet.*dsv"]):
+    return jsonify({"reply": 
         "DSV operates a large fleet in the UAE including:\n\n"
         "- 🚛 Flatbed trailers\n"
         "- 📦 Box trucks\n"
@@ -745,6 +777,54 @@ def chat():
         "- 🏙 Small city delivery trucks\n\n"
         "Fleet vehicles support all types of transport including full truckload (FTL), LTL, and container movements."})
 
+    # --- All Transport Terms & Conditions ---
+    if match([
+    r"all.*transport.*terms", r"transport.*terms.*conditions", r"full.*transport.*terms", r"all.*conditions",
+    r"list.*transport.*terms", r"all.*transport.*charges", r"transport.*policy", r"complete.*transport.*info",
+    r"full.*transport.*conditions", r"all.*included", r"show.*everything.*transport", r"transport.*rules"]):
+        return jsonify({"reply":
+        "**📦 Full Transportation Terms & Conditions:**\n\n"
+        "🚛 **General Notes:**\n"
+        "- Cargo height must not exceed truck limits (side sticks/headboard)\n"
+        "- Permit-required locations (e.g., city limits) need 2–3 working days processing\n"
+        "- Short-distance trips require loading and delivery on the same day\n\n"
+        "📅 **Validity:**\n"
+        "- Quotation valid for **15 days** from issuance\n\n"
+        "💸 **Additional Fees:**\n"
+        "- VAT: 5%\n"
+        "- Environmental Fee: AED 10 per trip/truck\n"
+        "- From Jan 2025: 0.15% of invoice value\n\n"
+        "📜 **Terms & Conditions:**\n"
+        "- On FOT-to-FOT basis (Free On Truck at both ends)\n"
+        "- Per trip per truck\n"
+        "- General cargo only\n"
+        "- Based on provided location; any changes require re-quote\n"
+        "- Valid only for stable, non-sandy, flat laydown areas\n"
+        "- Subject to truck availability at time of request\n"
+        "- Based on standard truck dimensions & UAE law\n"
+        "- Subject to DSV Standard Terms & Conditions\n"
+        "- Customer handles loading, offloading, supervision\n"
+        "- Sharjah/Ajman require Municipality permission\n"
+        "- Detention: AED 150/hour after free period\n"
+        "- Backhaul (same-day): +60%; next-day: full rate\n"
+        "- Sundays/Holidays: trip rate + 50%\n"
+        "- Force majeure applies to uncontrollable delays (weather, etc.)\n"
+        "- Point of contact, site hours, and map must be provided 48 hours in advance\n"
+        "- Prior notice of 24–48 hours is required for loading\n\n"
+        "✅ **Inclusions:**\n"
+        "- Fuel (diesel)\n"
+        "- DSV equipment & personnel insurance\n\n"
+        "❌ **Exclusions (billed as actuals):**\n"
+        "- Loading, offloading, supervision\n"
+        "- Port charges, gate passes, permits\n"
+        "- Cargo insurance\n"
+        "- Road tolls, road tax, customs, VGM, washing charges\n\n"
+        "❌ **Cancellation Charges:**\n"
+        "- 50% if cancelled before truck placement\n"
+        "- 100% if cancelled after truck placement\n"
+        "- Waived if cancelled 24 hours in advance\n\n"
+        "Let me know if you'd like clarification on any specific point."})
+    
     if match([r"\bfleet\b", r"\bdsv fleet\b",r"\bdsv transportation\b", r"truck fleet", r"transport fleet", r"fleet info"]):
         return jsonify({"reply": "DSV operates a large fleet in the UAE including:\n- Flatbed trailers\n- Box trucks\n- Double trailers\n- Refrigerated trucks (chiller/freezer)\n- Lowbeds\n- Tippers\n- Small city delivery trucks\nFleet vehicles support all types of transport including full truckload (FTL), LTL, and container movements."})
     if match([r"truck types", r"trucks", r"transportation types", r"dsv trucks", r"transport.*available", r"types of transport", r"trucking services"]):
@@ -760,6 +840,23 @@ def chat():
         "- 🚚 Double trailers for high-volume long-haul moves\n"
         "- 🏙 Small city trucks for last-mile distribution\n\n"
         "All transport is coordinated by our OCC team in Abu Dhabi with real-time tracking, WMS integration, and documentation support."})
+    
+    if match([r"fot to fot", r"f\.o\.t to f\.o\.t", r"fot basis", r"what is fot", r"fot meaning", r"fot to fot basis"]):
+        return jsonify({"reply":
+        "**FOT to FOT basis** stands for *Free On Truck to Free On Truck*. It means:\n\n"
+        "- 🚚 Cargo is picked up from the origin **on a truck**\n"
+        "- 🚚 Delivered to the destination **on a truck**\n"
+        "- ❌ Loading/unloading at either end is **not included**\n\n"
+        "This term is commonly used in DSV transport quotes to define the scope of delivery responsibility."})
+    
+    if match([
+    r"\bltl\b", r"less than truckload", r"ltl shipment", r"ltl meaning", r"what is ltl",
+    r"\blcl\b", r"less than container load", r"lcl shipment", r"lcl meaning", r"what is lcl"]):
+        return jsonify({"reply":
+        "**LTL** and **LCL** are shared-load logistics terms:\n\n"
+        "- 🚛 **LTL (Less Than Truckload)**: For road shipments that don’t fill a full truck. Your cargo shares space with others.\n"
+        "- 🚢 **LCL (Less Than Container Load)**: For sea shipments that don’t fill a full container. Cargo is consolidated with others in a single container.\n\n"
+        "DSV offers both services globally and within the UAE for cost-effective partial loads."})
 
     # --- UAE Emirates Distance + Travel Time (Individual Matches) ---
     if match([r"abu dhabi.*dubai|dubai.*abu dhabi"]):
@@ -815,7 +912,53 @@ def chat():
         "- Ghayathi: **240 km**\n"
         "- Ruwais: **250 km**\n"
         "\nLet me know if you need travel time or transport support too.")})
-        # --- DSV Abu Dhabi Facility Sizes ---
+
+# --- Environmental Fee ---
+    if match([r"environmental fee", r"environment fee", r"0\.15%.*fee", r"green surcharge", r"eco fee"]):
+        return jsonify({"reply":
+        "🚛 Environmental Fees:\n- AED 10.00 per trip/truck\n- Effective 1 Jan 2025: 0.15% of invoice value added as environmental surcharge."})
+
+# --- Cancellation Charges ---
+    if match([r"cancellation charge", r"cancel.*trip", r"cancel.*transport", r"trip cancelled", r"transport cancellation policy"]):
+        return jsonify({"reply":
+        "**Cancellation Charges:**\n- ❌ 50% if cancelled before truck placement\n- ❌ 100% if cancelled after truck placement\n- ✅ No charge if cancelled 24 hours in advance."})
+
+# --- Validity ---
+    if match([r"validity", r"quotation validity", r"how long.*quote", r"rate.*valid", r"validity of transport"]):
+        return jsonify({"reply": "📅 Transport quotation validity is **15 days** from the date of issue."})
+
+# --- Loading / Offloading ---
+    if match([r"loading.*included", r"offloading.*included", r"who loads", r"who unloads", r"customer.*loading", r"customer.*offloading"]):
+        return jsonify({"reply": "🚫 Loading and offloading are under **customer scope**. DSV provides trucks on an FOT-to-FOT basis only."})
+
+# --- Backhaul / Backload ---
+    if match([r"backhaul", r"backload", r"return trip", r"same day return", r"delivery back to origin"]):
+        return jsonify({"reply":
+        "🔄 **Backhaul/Backload Charges:**\n- Same-day return to origin: **+60%** of trip charge\n- Next-day return: **100%** of trip charge\n- Separate location = separate trip rate."})
+
+# --- Sharjah / Ajman Municipality ---
+    if match([r"sharjah.*permission", r"ajman.*municipality", r"offload.*road", r"load.*outside", r"warehouse.*inside.*loading"]):
+        return jsonify({"reply":
+        "⚠️ For Sharjah & Ajman:\n- Customer must arrange **Municipality loading/offloading permission**\n- Operations must happen **inside premises only** — activity on the road is not allowed and fines will be passed to the client."})
+
+# --- Inclusions ---
+    if match([r"what.*included", r"included.*transport", r"transport.*inclusions"]):
+        return jsonify({"reply": "✅ **Inclusions:**\n- DSV Equipment Insurance\n- Personnel Insurance\n- Fuel (Diesel)"})
+
+# --- Exclusions ---
+    if match([r"what.*excluded", r"excluded.*transport", r"transport.*exclusions"]):
+        return jsonify({"reply": "❌ **Exclusions:**\n- Loading/Offloading/Supervision\n- Port handling, customs, tolls, permits, road taxes, gate passes, washing, cargo insurance, and third-party fees."})
+
+# --- Force Majeure ---
+    if match([r"force majeure", r"weather condition", r"sandstorm", r"rain.*delay", r"high wind", r"delays due to weather"]):
+        return jsonify({"reply":
+        "🌪️ **Force Majeure Clause:**\nDelays due to weather (sandstorms, rain, wind) or unforeseen events are considered normal working hours. Detention will apply beyond free hours. DSV reserves the right to claim costs if delays impact delivery."})
+
+# --- Detention Charges ---
+    if match([r"detention", r"detention charges", r"wait time charges", r"extra time", r"delays at site", r"truck waiting"]):
+        return jsonify({"reply": "🕒 **Detention Charges:**\n- AED 150 per truck after 1 free hour of waiting at site."})
+  
+    # --- DSV Abu Dhabi Facility Sizes ---
     if match([
         r"plot size", r"abu dhabi total area", r"site size", r"facility size", r"total sqm", r"how big",
         r"yard size", r"open yard area", r"size of open yard", r"open yard.*size", r"area of open yard"]):
@@ -854,6 +997,44 @@ def chat():
             }
             client_name = clients.get(chamber, "unknown")
             return jsonify({"reply": f"Chamber {chamber} is occupied by {client_name}."})
+   
+if match([
+    r"like what", r"such as", r"for example", r"what kind of help", r"what.*can.*you.*help.*with", 
+    r"what.*do.*you.*do", r"what.*things.*you.*can.*do", r"can.*you.*give.*example", r"what.*services.*you.*offer",
+    r"what.*can.*u.*do", r"what.*can.*u.*help", r"what.*you.*provide"]):
+        return jsonify({"reply":
+        "Sure! I can help you with:\n\n"
+        "📦 Storage rates (Standard, Chemical, Open Yard)\n"
+        "🚛 Transport & truck types (flatbeds, reefers, lowbeds...)\n"
+        "🧾 Value Added Services like packing, labeling, inventory\n"
+        "🏢 DSV warehouse layouts, temperature zones, and chambers\n"
+        "📍 UAE-wide transport routes & distances\n"
+        "📚 Relocation, asset management, and more\n\n"
+        "Ask me about anything related to DSV warehousing, logistics, or transport!"})
+
+    if match([
+    r"who are you", r"who r u", r"who.*you", r"who.*are.*you", r"what.*can.*you.*do",
+    r"what can u do", r"what can you help with", r"how can you help", r"can u help", r"what can u help me with",
+    r"how u help", r"your purpose", r"your role", r"what do u do", r"what.*can.*you.*answer"]):
+        return jsonify({"reply":
+        "I'm the DSV logistics assistant 🤖 here to help you with:\n\n"
+        "- 📦 Storage rates (Standard, Chemical, Open Yard)\n"
+        "- 🚛 Transportation options and truck types\n"
+        "- 🧾 Value Added Services (VAS)\n"
+        "- 🏢 Warehouse info: size, layout, chambers\n"
+        "- 🧊 Temperature zones, RMS, training\n"
+        "- 📍 Distances and service locations across the UAE\n\n"
+        "Ask me anything related to DSV warehousing, transport, or logistics!"})
+
+    if match([r"how many.*facility", r"how many.*facilities", r"dsv abu dhabi facilities", r"how many warehouse.*dsv"]):
+        return jsonify({"reply":
+        "DSV Abu Dhabi operates multiple logistics facilities:\n\n"
+        "- 🏢 **21K Warehouse (Mussafah)** – 21,000 sqm\n"
+        "- 🏢 **M44** – 5,760 sqm\n"
+        "- 🏢 **M45** – 5,000 sqm\n"
+        "- 🏢 **Al Markaz (Hameem)** – 12,000 sqm\n"
+        "- 🏗 **Open Yard (Mussafah + KIZAD)** – 360,000 sqm\n\n"
+        "In total: **~44,000 sqm** of covered warehouse and **481,000 sqm** logistics site including service roads."})
 
     # --- Friendly Chat ---
     if match([r"\bhello\b|\bhi\b|\bhey\b|good morning|good evening"]):
