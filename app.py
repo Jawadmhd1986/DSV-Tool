@@ -144,71 +144,123 @@ def chat():
         text = text.lower().strip()
 
     # Common chat language
-        text = re.sub(r"\bu\b", "you", text)
-        text = re.sub(r"\bur\b", "your", text)
-        text = re.sub(r"\br\b", "are", text)
-        text = re.sub(r"\bpls\b", "please", text)
-        text = re.sub(r"\bthx\b", "thanks", text)
-        text = re.sub(r"\binfo\b", "information", text)
-        text = re.sub(r"\bhru\b", "how are you", text)
-        text = re.sub(r"\bh\s*r\s*u\b", "how are you", text)
-        text = re.sub(r"how\s*u\s*doing", "how are you", text)
-        text = re.sub(r"how\s*r\s*u", "how are you", text)
+text = re.sub(r"\bu\b", "you", text)
+text = re.sub(r"\bur\b", "your", text)
+text = re.sub(r"\br\b", "are", text)
+text = re.sub(r"\bpls\b", "please", text)
+text = re.sub(r"\bplz\b", "please", text)
+text = re.sub(r"\bthx\b", "thanks", text)
+text = re.sub(r"\binfo\b", "information", text)
+text = re.sub(r"\bassist\b", "help", text)
+text = re.sub(r"\bhru\b", "how are you", text)
+text = re.sub(r"\bh\s*r\s*u\b", "how are you", text)
+text = re.sub(r"how\s*u\s*doing", "how are you", text)
+text = re.sub(r"how\s*r\s*u", "how are you", text)
+text = re.sub(r"\bhw\b", "how", text)
+text = re.sub(r"\bwht\b", "what", text)
+text = re.sub(r"\bcn\b", "can", text)
+text = re.sub(r"\bwhats up\b", "how are you", text)
+text = re.sub(r"\bwho r u\b", "who are you", text)
 
-    # Logistics & warehouse short forms
-        text = re.sub(r"\bwh\b", "warehouse", text)
-        text = re.sub(r"\bw\/h\b", "warehouse", text)
-        text = re.sub(r"\binv\b", "inventory", text)
-        text = re.sub(r"\btemp\b", "temperature", text)
-        text = re.sub(r"\btemp zone\b", "temperature zone", text)
-        text = re.sub(r"\bwms system\b", "wms", text)
+# Logistics & warehouse short forms
+text = re.sub(r"\bwh\b", "warehouse", text)
+text = re.sub(r"\bw/w\b", "warehouse", text)
+text = re.sub(r"\bw\/h\b", "warehouse", text)
+text = re.sub(r"\binv\b", "inventory", text)
+text = re.sub(r"\btemp zone\b", "temperature zone", text)
+text = re.sub(r"\btemp\b", "temperature", text)
+text = re.sub(r"\bwms system\b", "wms", text)
+text = re.sub(r"\bwms\b", "warehouse management system", text)
 
-    # Transportation & locations
-        text = re.sub(r"\brak\b", "ras al khaimah", text)
-        text = re.sub(r"\babudhabi\b", "abu dhabi", text)
-        text = re.sub(r"\babudhabi\b", "abu dhabi", text)
-        text = re.sub(r"\bdxb\b", "dubai", text)
+# Transportation & locations
+text = re.sub(r"\brak\b", "ras al khaimah", text)
+text = re.sub(r"\babudhabi\b", "abu dhabi", text)
+text = re.sub(r"\bdxb\b", "dubai", text)
+text = re.sub(r"\bdubaii\b", "dubai", text)
+text = re.sub(r"\bdubal\b", "dubai", text)
+text = re.sub(r"\bdubia\b", "dubai", text)
+text = re.sub(r"\babu dabi\b", "abu dhabi", text)
+text = re.sub(r"\bt&c\b", "terms and conditions", text)
+text = re.sub(r"\bt and c\b", "terms and conditions", text)
 
-    # Industry abbreviations
-        text = re.sub(r"\bo&g\b", "oil and gas", text)
-        text = re.sub(r"\bdg\b", "dangerous goods", text)
-        text = re.sub(r"\bfmcg\b", "fast moving consumer goods", text)
+# Industry abbreviations
+text = re.sub(r"\bo&g\b", "oil and gas", text)
+text = re.sub(r"\bdg\b", "dangerous goods", text)
+text = re.sub(r"\bfmcg\b", "fast moving consumer goods", text)
 
-    # Quotation & VAS
-        text = re.sub(r"\bdoc\b", "documentation", text)
-        text = re.sub(r"\bdocs\b", "documentation", text)
-        text = re.sub(r"\bmsds\b", "material safety data sheet", text)
-        text = re.sub(r"\bvas\b", "value added services", text)
+# Quotation & VAS
+text = re.sub(r"\bdoc\b", "documentation", text)
+text = re.sub(r"\bdocs\b", "documentation", text)
+text = re.sub(r"\bmsds\b", "material safety data sheet", text)
+text = re.sub(r"\bvas\b", "value added services", text)
+text = re.sub(r"\bquote\b", "quotation", text)
+text = re.sub(r"\bquation\b", "quotation", text)
+text = re.sub(r"\bquotatoin\b", "quotation", text)
+text = re.sub(r"\boffer\b", "quotation", text)
+text = re.sub(r"\bproposal\b", "quotation", text)
+text = re.sub(r"\bproposl\b", "quotation", text)
+text = re.sub(r"\bvases\b", "value added services", text)
+text = re.sub(r"\bvalus added services\b", "value added services", text)
 
-    # E-commerce variations
-        text = re.sub(r"\be[\s\-]?commerce\b", "ecommerce", text)
-        text = re.sub(r"\bshop logistics\b", "ecommerce", text)
+# E-commerce variations
+text = re.sub(r"\be[\s\-]?commerce\b", "ecommerce", text)
+text = re.sub(r"\bshop logistics\b", "ecommerce", text)
 
-    # Logistics models
-        text = re.sub(r"\b3\.5pl\b", "three and half pl", text)
-        text = re.sub(r"\b2pl\b", "second party logistics", text)
-        text = re.sub(r"\b3pl\b", "third party logistics", text)
-        text = re.sub(r"\b4pl\b", "fourth party logistics", text)
+# Logistics models
+text = re.sub(r"\b3\.5pl\b", "three and half pl", text)
+text = re.sub(r"\b2pl\b", "second party logistics", text)
+text = re.sub(r"\b3pl\b", "third party logistics", text)
+text = re.sub(r"\b4pl\b", "fourth party logistics", text)
+text = re.sub(r"\b5pl\b", "fifth party logistics", text)
+text = re.sub(r"\b6pl\b", "sixth party logistics", text)
 
-    # Fleet & vehicle types
-        text = re.sub(r"\breefer\b", "refrigerated truck", text)
-        text = re.sub(r"\bchiller\b", "refrigerated truck", text)
-        text = re.sub(r"\bcity truck\b", "small truck", text)
-        text = re.sub(r"\bev truck\b", "electric truck", text)
+# Fleet & vehicle types
+text = re.sub(r"\breefer\b", "refrigerated truck", text)
+text = re.sub(r"\bchiller\b", "refrigerated truck", text)
+text = re.sub(r"\bcity truck\b", "small truck", text)
+text = re.sub(r"\bev truck\b", "electric truck", text)
+text = re.sub(r"\bcity delivery\b", "last mile", text)
+text = re.sub(r"\btransprt\b", "transport", text)
+text = re.sub(r"\btrnasport\b", "transport", text)
+text = re.sub(r"\bmachineries\b", "machinery", text)
+text = re.sub(r"\bmhe\b", "material handling equipment", text)
 
-    # Fire system
-        text = re.sub(r"\bfm200\b", "fm 200", text)
+# --- Container Unit Typos & Variants ---
+text = re.sub(r"\b20feet\b", "20 ft", text)
+text = re.sub(r"\b20foot\b", "20 ft", text)
+text = re.sub(r"\b20feet container\b", "20 ft container", text)
+text = re.sub(r"\b20ft\b", "20 ft", text)
 
-    # Misc business terms
-        text = re.sub(r"\bkitting\b", "kitting and assembly", text)
-        text = re.sub(r"\btagging\b", "labeling", text)
-        text = re.sub(r"\basset tagging\b", "asset labeling", text)
-        text = re.sub(r"\btransit store\b", "transit warehouse", text)
-        text = re.sub(r"\basset mgmt\b", "asset management", text)
-        text = re.sub(r"\bmidday break\b", "summer break", text)
+text = re.sub(r"\brefeer\b", "reefer", text)
+text = re.sub(r"\bchiller\b", "reefer", text)
+text = re.sub(r"\bchilled container\b", "reefer container", text)
 
-    # Strip non-alphanumeric except spaces
-        text = re.sub(r"[^a-z0-9\s\.]", "", text)
+text = re.sub(r"\b40feet\b", "40 ft", text)
+text = re.sub(r"\b40foot\b", "40 ft", text)
+text = re.sub(r"\b40feet container\b", "40 ft container", text)
+text = re.sub(r"\b40ft\b", "40 ft", text)
+
+# Fire system
+text = re.sub(r"\bfm200\b", "fm 200", text)
+
+# Misc business terms
+text = re.sub(r"\bkitting\b", "kitting and assembly", text)
+text = re.sub(r"\btagging\b", "labeling", text)
+text = re.sub(r"\basset tagging\b", "asset labeling", text)
+text = re.sub(r"\btransit store\b", "transit warehouse", text)
+text = re.sub(r"\basset mgmt\b", "asset management", text)
+text = re.sub(r"\bmidday break\b", "summer break", text)
+text = re.sub(r"\bwharehouse\b", "warehouse", text)
+text = re.sub(r"\bwmsytem\b", "wms", text)
+text = re.sub(r"\bopen yrd\b", "open yard", text)
+text = re.sub(r"\bstorge\b", "storage", text)
+text = re.sub(r"\bstorag\b", "storage", text)
+text = re.sub(r"\bchecmical\b", "chemical", text)
+text = re.sub(r"\bstandrad\b", "standard", text)
+text = re.sub(r"\blabelling\b", "labeling", text)
+
+# Strip non-alphanumeric except spaces and periods
+text = re.sub(r"[^a-z0-9\s\.]", "", text)
 
         return text
 
@@ -216,9 +268,6 @@ def chat():
 
     def match(patterns):
         return any(re.search(p, message) for p in patterns)
-    
-    if match([r"\bwarehouse\b", r"\bwarehousing\b", r"warehouse info", r"tell me about warehouse", r"warehouse?"]):
-        return jsonify({"reply": "Can you clarify what aspect of the warehouse you're asking about? We can help with:\n- 📦 Warehouse size or layout\n- ❄️ Temperature zones (ambient, cold, freezer)\n- 🏗 Racking & pallet types\n- 🛠️ Warehouse services or processes\n- 🧑‍🏭 Training & QHSE\n\nLet me know which part you're interested in."})
     
 # --- Containers (All Types + Flexible Unit Recognition) ---
     if match([r"healthcare|medical storage|pharma warehouse|pharma|pharmaceutical storage"]):
@@ -228,20 +277,73 @@ def chat():
         return jsonify({"reply": "Here are the main container types and their specifications:\n\n📦 **20ft Container**:\n- Length: 6.1m, Width: 2.44m, Height: 2.59m\n- Payload: ~28,000 kg\n- Capacity: ~33 CBM\n\n📦 **40ft Container**:\n- Length: 12.2m, Width: 2.44m, Height: 2.59m\n- Payload: ~30,400 kg\n- Capacity: ~67 CBM\n\n⬆️ **40ft High Cube**:\n- Same as 40ft but height = 2.9m\n- Ideal for voluminous goods\n\n❄️ **Reefer Container (20ft & 40ft)**:\n- Insulated, temperature-controlled (+2°C to –25°C)\n- Used for food, pharma, perishables\n\n🏗 **Open Top Container**:\n- No roof, allows crane loading\n- For tall cargo (e.g. machinery, steel)\n\n🪜 **Flat Rack Container**:\n- No sides or roof\n- Used for oversized loads like vehicles or transformers\n\n📦 **SME Containers**:\n- Custom modular containers used in the UAE for small-scale import/export or temporary storage by SMEs\n\nLet me know if you'd like help choosing the right container for your cargo!"})
 
 # Specific container types with ft/feet/foot flexibility
-    if match([r"20\s*(ft|feet|foot)\s*container", r"\btwenty\s*(ft|feet|foot)?\s*container"]):
-        return jsonify({"reply": "A 20ft container is 6.1m long × 2.44m wide × 2.59m high, capacity ~33 CBM, and payload up to 28,000 kg. Ideal for compact or heavy cargo."})
+    if match([
+    r"\b20\s*(ft|feet|foot)\b", r"\btwenty\s*(ft|feet|foot)?\b",
+    r"\b20 ft\b.*", r".*20.*container.*", r"container.*20 ft", r"^20 ft$", r"^20 feet$", r"20ft spec"]):
+        return jsonify({"reply":
+        "📦 **20ft Container Specs**:\n"
+        "- Length: 6.1m\n"
+        "- Width: 2.44m\n"
+        "- Height: 2.59m\n"
+        "- Capacity: ~33 CBM\n"
+        "- Max Payload: ~28,000 kg\n\n"
+        "Ideal for compact or heavy cargo like pallets, boxes, or general freight."})
 
-    if match([r"40\s*(ft|feet|foot)\s*container", r"\bforty\s*(ft|feet|foot)?\s*container"]):
-        return jsonify({"reply": "A 40ft container is 12.2m long × 2.44m wide × 2.59m high, capacity ~67 CBM, and payload up to 30,400 kg. Suitable for palletized or bulk shipments."})
+    # --- 40ft Container (Flexible) ---
+    if match([
+    r"\b40\s*(ft|feet|foot)\b", r"\bforty\s*(ft|feet|foot)?\b",
+    r"\b40 ft\b.*", r".*40.*container.*", r"container.*40 ft", r"^40 ft$", r"^40 feet$", r"40ft spec"]):
+        return jsonify({"reply":
+        "📦 **40ft Container Specs**:\n"
+        "- Length: 12.2m\n"
+        "- Width: 2.44m\n"
+        "- Height: 2.59m\n"
+        "- Capacity: ~67 CBM\n"
+        "- Max Payload: ~30,400 kg\n\n"
+        "Perfect for palletized or high-volume cargo. Widely used for full truckload and global sea freight."})
 
-    if match([r"\bhigh cube\b.*container", r"40\s*(ft|feet|foot)\s*high cube", r"high cube container"]):
-        return jsonify({"reply": "A 40ft High Cube container is 2.9m tall, 1 foot taller than standard containers. Ideal for bulky or voluminous cargo."})
+    # --- High Cube Container (Flexible) ---
+    if match([
+    r"\bhighcube\b", r"high cube", r"40\s*(ft|feet|foot)\s*high cube",
+    r"high cube container", r"40ft.*high cube", r"high cube spec", r"taller container"]):
+        return jsonify({"reply":
+        "⬆️ **40ft High Cube Container Specs**:\n\n"
+        "- Same length/width as standard 40ft:\n"
+        "  • Length: 12.2m\n"
+        "  • Width: 2.44m\n"
+        "- **Height: 2.9m** (vs 2.59m standard)\n"
+        "- Capacity: ~76 CBM\n\n"
+        "**Ideal for voluminous cargo** where height matters — such as light bulk goods, furniture, or machines requiring upright transport."})
 
-    if match([r"reefer", r"refrigerated container", r"chiller container"]):
-        return jsonify({"reply": "Reefer containers are temperature-controlled (+2°C to –25°C), ideal for perishables like food and pharmaceuticals. Available in 20ft and 40ft sizes."})
+    # --- Reefer Container (Flexible) ---
+    if match([
+    r"\breefer\b", r"reefer container", r"refrigerated container", r"chiller container", 
+    r"cold storage container", r"reefer.*(20|40)ft", r"reefer specs", r"reefer box"]):
+        return jsonify({"reply":
+        "❄️ **Reefer (Refrigerated) Containers**:\n\n"
+        "- Available in **20ft** and **40ft** sizes\n"
+        "- Insulated with temperature control: **+2°C to –25°C**\n"
+        "- Used for: food, pharmaceuticals, perishables\n"
+        "- Plug-in units with cooling system (electric or diesel)\n\n"
+        "**Specs Example (40ft Reefer):**\n"
+        "- Length: 12.2m, Width: 2.44m, Height: 2.59m\n"
+        "- Capacity: ~67 CBM\n\n"
+        "Let me know if you want 20ft specs or details for sea/road use!"})
 
-    if match([r"open top container", r"open roof", r"no roof container"]):
-        return jsonify({"reply": "Open Top containers are used for tall or top-loaded cargo like steel coils, pipes, or machinery. They allow crane access from above."})
+    # --- Open Top Container (Flexible) ---
+    if match([
+    r"open top container", r"open top", r"top open", r"open roof", r"no roof container",
+    r"container.*open top", r"container.*no roof", r"crane loaded container", r"top loading container"]):
+        return jsonify({"reply":
+        "🏗 **Open Top Container Specs**:\n\n"
+        "- Length: 20ft or 40ft\n"
+        "- No solid roof — uses removable tarpaulin cover\n"
+        "- Same base dimensions as standard container\n"
+        "- Allows top loading via crane or forklift\n\n"
+        "**Used for:**\n"
+        "- Tall cargo (e.g., pipes, steel coils, machinery)\n"
+        "- Oversized height loads\n"
+        "- Construction or industrial freight requiring vertical access"})
 
     if match([r"flat rack", r"no sides container", r"flat rack container"]):
         return jsonify({"reply": "Flat Rack containers have no sides or roof, perfect for oversized cargo such as vehicles, generators, or heavy equipment."})
@@ -259,39 +361,6 @@ def chat():
         "🟦 **Standard Pallet**:\n- Size: 1.2m × 1.0m\n- Load capacity: ~1,000 kg\n- Fits **14 pallets per bay**\n\n"
         "🟨 **Euro Pallet**:\n- Size: 1.2m × 0.8m\n- Load capacity: ~800 kg\n- Fits **21 pallets per bay**\n\n"
         "Pallets are used for racking, picking, and transport. DSV also offers VAS like pallet loading, shrink wrapping, labeling, and stretch film wrapping for safe handling."})
-
-# --- Full VAS List (All Categories) ---
-    if match([
-    r"all vas", r"give me all vas", r"list all vas", r"show all vas", r"full vas list",
-    r"all value added services", r"show me all value added services", r"vas full list", r"complete vas list"]):
-        return jsonify({"reply":
-        "**📦 Standard VAS:**\n"
-        "- In/Out Handling: 20 AED/CBM\n"
-        "- Pallet Loading: 12 AED/pallet\n"
-        "- Documentation: 125 AED/set\n"
-        "- Packing with pallet: 85 AED/CBM\n"
-        "- Inventory Count: 3,000 AED/event\n"
-        "- Case Picking: 2.5 AED/carton\n"
-        "- Sticker Labeling: 1.5 AED/label\n"
-        "- Shrink Wrapping: 6 AED/pallet\n"
-        "- VNA Usage: 2.5 AED/pallet\n\n"
-        "**🧪 Chemical VAS:**\n"
-        "- Handling (Palletized): 20 AED/CBM\n"
-        "- Handling (Loose): 25 AED/CBM\n"
-        "- Documentation: 150 AED/set\n"
-        "- Packing with pallet: 85 AED/CBM\n"
-        "- Inventory Count: 3,000 AED/event\n"
-        "- Inner Bag Picking: 3.5 AED/bag\n"
-        "- Sticker Labeling: 1.5 AED/label\n"
-        "- Shrink Wrapping: 6 AED/pallet\n\n"
-        "**🏗 Open Yard VAS:**\n"
-        "- Forklift (3T–7T): 90 AED/hr\n"
-        "- Forklift (10T): 200 AED/hr\n"
-        "- Forklift (15T): 320 AED/hr\n"
-        "- Mobile Crane (50T): 250 AED/hr\n"
-        "- Mobile Crane (80T): 450 AED/hr\n"
-        "- Container Lifting: 250 AED/lift\n"
-        "- Container Stripping (20ft): 1,200 AED/hr"})
 
     # --- All Storage Rates at Once ---
     if match([
@@ -354,6 +423,19 @@ def chat():
     if match([r"^chemical non ac$", r"non-ac chemical", r"chemical non ac storage", r"^non ac$"]):
         return jsonify({"reply": "Chemical Non-AC storage is 2.7 AED/CBM/day. Chemical VAS applies."})
 
+# --- Open Yard Overview ---
+    if match([
+    r"tell me about open yard", r"open yard info", r"open yard overview", r"what is open yard",
+    r"open yard introduction", r"open yard facility", r"describe open yard"]):
+        return jsonify({"reply":
+        "🏗️ **DSV Open Yard Overview:**\n\n"
+        "- 📍 **Mussafah Open Yard**: 160 AED/SQM/year\n"
+        "- 📍 **KIZAD Open Yard**: 125 AED/SQM/year\n"
+        "- 🔲 Total Area: **360,000 SQM** across both sites\n"
+        "- ✅ Ideal for containers, equipment, heavy goods\n"
+        "- 🔧 VAS includes forklifts, cranes, and lifting services\n\n"
+        "📧 For availability, contact Antony Jeyaraj at **antony.jeyaraj@dsv.com**"})
+
 # --- Open Yard Storage ---
     if match([r"^open yard$", r"open yard storage", r"open yard rate", r"open yard storage rate"]):
         return jsonify({"reply": "Do you mean Open Yard in Mussafah or KIZAD?"})
@@ -367,16 +449,6 @@ def chat():
         return jsonify({"reply": "Open Yard KIZAD storage is **125 AED/SQM/year**. WMS is excluded. For availability, contact Antony Jeyaraj at antony.jeyaraj@dsv.com."})
     if match([r"^mussafah$", r"\bmussafah\b"]):
         return jsonify({"reply": "Open Yard Mussafah storage is **160 AED/SQM/year**. WMS is excluded. For availability, contact Antony Jeyaraj at antony.jeyaraj@dsv.com."})
-
-    # --- vas Rate ---
-    if match([
-    r"\bvas\b", r"what is vas", r"vas meaning", r"value added services", r"explain vas"]):
-        return jsonify({"reply":
-        "VAS stands for **Value Added Services**. Can you please specify which one you're referring to?\n\n"
-        "- 🟦 Standard VAS (for AC/Non-AC/Open Shed)\n"
-        "- 🧪 Chemical VAS\n"
-        "- 🏗 Open Yard VAS\n\n"
-        "Let me know and I’ll share the full list of charges!"})
 
     if match([
     r"standard vas", r"standard", r"standard value added services", r"normal vas", r"normal value added services",
@@ -447,7 +519,50 @@ def chat():
         "- Container Lifting: 250 AED/lift\n"
         "- Container Stripping (20ft): 1,200 AED/hr"})
 
-    # --- Storage Rate Matching ---
+# --- Full VAS List (All Categories) ---
+    if match([
+    r"all vas", r"give me all vas", r"list all vas", r"show all vas", r"full vas list",
+    r"all value added services", r"show me all value added services", r"vas full list", r"complete vas list"]):
+        return jsonify({"reply":
+        "**📦 Standard VAS:**\n"
+        "- In/Out Handling: 20 AED/CBM\n"
+        "- Pallet Loading: 12 AED/pallet\n"
+        "- Documentation: 125 AED/set\n"
+        "- Packing with pallet: 85 AED/CBM\n"
+        "- Inventory Count: 3,000 AED/event\n"
+        "- Case Picking: 2.5 AED/carton\n"
+        "- Sticker Labeling: 1.5 AED/label\n"
+        "- Shrink Wrapping: 6 AED/pallet\n"
+        "- VNA Usage: 2.5 AED/pallet\n\n"
+        "**🧪 Chemical VAS:**\n"
+        "- Handling (Palletized): 20 AED/CBM\n"
+        "- Handling (Loose): 25 AED/CBM\n"
+        "- Documentation: 150 AED/set\n"
+        "- Packing with pallet: 85 AED/CBM\n"
+        "- Inventory Count: 3,000 AED/event\n"
+        "- Inner Bag Picking: 3.5 AED/bag\n"
+        "- Sticker Labeling: 1.5 AED/label\n"
+        "- Shrink Wrapping: 6 AED/pallet\n\n"
+        "**🏗 Open Yard VAS:**\n"
+        "- Forklift (3T–7T): 90 AED/hr\n"
+        "- Forklift (10T): 200 AED/hr\n"
+        "- Forklift (15T): 320 AED/hr\n"
+        "- Mobile Crane (50T): 250 AED/hr\n"
+        "- Mobile Crane (80T): 450 AED/hr\n"
+        "- Container Lifting: 250 AED/lift\n"
+        "- Container Stripping (20ft): 1,200 AED/hr"})
+
+# --- vas Rate ---
+    if match([
+    r"\bvas\b", r"what is vas", r"vas meaning", r"value added services", r"explain vas"]):
+        return jsonify({"reply":
+        "VAS stands for **Value Added Services**. Can you please specify which one you're referring to?\n\n"
+        "- 🟦 Standard VAS (for AC/Non-AC/Open Shed)\n"
+        "- 🧪 Chemical VAS\n"
+        "- 🏗 Open Yard VAS\n\n"
+        "Let me know and I’ll share the full list of charges!"})
+   
+# --- Storage Rate Matching ---
     if match([r"open yard.*mussafah"]):
         return jsonify({"reply": "Open Yard Mussafah storage is 160 AED/SQM/year. WMS is excluded. VAS includes forklifts, cranes, and container lifts."})
     if match([r"open yard.*kizad"]):
@@ -470,8 +585,7 @@ def chat():
         return jsonify({"reply": 
         "RMS (Record Management System) at DSV is located inside the 21K warehouse in Mussafah. It is used to store and manage physical documents, archives, and secure records for clients like Civil Defense.\n\n"
         "The RMS area is equipped with an **FM200 fire suppression system** for safe document protection. Note: RMS is not used for storing Return Material."})
-    if match([r"asset management", r"what is asset management", r"tracking of assets", r"rfid.*asset"]):
-        return jsonify({"reply": "DSV offers complete **Asset Management** solutions including:\n- Barcode or RFID tracking\n- Asset labeling\n- Storage and life-cycle monitoring\n- Secure location control\n\nIdeal for IT equipment, tools, calibration items, and government assets."})
+    
     if match([r"quote.*asset", r"quotation.*asset management", r"what.*collect.*client.*asset", r"info.*for.*asset.*quotation"]):
         return jsonify({"reply":
         "To prepare an **Asset Management** quotation, collect the following from the client:\n"
@@ -480,8 +594,19 @@ def chat():
         "3️⃣ Duration of storage or tracking\n"
         "4️⃣ Reporting/reporting system integration needs\n"
         "5️⃣ Any relocation, retrieval, or disposal cycles"})
-    if match([r"asset labeling", r"asset labelling", r"label assets", r"tagging assets", r"rfid tagging", r"barcode tagging"]):
-        return jsonify({"reply": "DSV provides **Asset Labeling** services using RFID or barcode tags. Labels include:\n- Unique ID numbers\n- Ownership info\n- Scannable codes for inventory and asset tracking\nThese are applied during intake or on-site at the client's request."})
+    if match([r"asset management", r"what is asset management", r"tracking of assets", r"rfid.*asset"]):
+        return jsonify({"reply": "DSV offers complete **Asset Management** solutions including:\n- Barcode or RFID tracking\n- Asset labeling\n- Storage and life-cycle monitoring\n- Secure location control\n\nIdeal for IT equipment, tools, calibration items, and government assets."})
+    if match([
+    r"asset labeling", r"asset labelling", r"label assets", r"tagging assets",
+    r"rfid tagging", r"barcode tagging", r"labeling", r"labelling", 
+    r"what is labeling", r"labeling service", r"labeling support", 
+    r"label.*asset", r"asset.*tag"]):
+        return jsonify({"reply": 
+        "DSV provides **Asset Labeling** services using RFID or barcode tags. Labels include:\n"
+        "- Unique ID numbers\n"
+        "- Ownership info\n"
+        "- Scannable codes for inventory and asset tracking\n\n"
+        "These labels are applied during intake or on-site at the client’s location upon request."})
 
     # --- 21K Warehouse Racking Info ---
     if match([
@@ -526,20 +651,14 @@ def chat():
         "- **M45**: 5,000 sqm\n"
         "- **Al Markaz (Hameem)**: 12,000 sqm\n\n"
         "Additionally, we have **360,000 sqm** of open yard space, and a total logistics site of **481,000 sqm** including service roads and utilities."})
-
+    
 # --- Warehouse Space Availability ---
     if match([
     r"warehouse.*space.*available", r"do you have.*warehouse.*space", r"space in warehouse", 
     r"any warehouse space", r"warehouse availability", r"available.*storage", 
     r"available.*warehouse", r"wh space.*available", r"vacant.*warehouse"]):
         return jsonify({"reply": "For warehouse occupancy, please contact Biju Krishnan at **biju.krishnan@dsv.com**. He’ll assist with availability, allocation, and scheduling a site visit if needed."})
-# --- Open Yard Space Availability ---
-    if match([
-    r"open yard.*occupancy", r"space.*open yard",r"space", r"open yard.*available", 
-    r"do we have.*open yard", r"open yard availability", r"open yard.*space", 
-    r"yard capacity", r"yard.*vacancy", r"any.*open yard.*space"]):
-        return jsonify({"reply": "For open yard occupancy, please contact Antony Jeyaraj at **antony.jeyaraj@dsv.com**. He can confirm available space and assist with pricing or scheduling a visit."})
-# --- Warehouse Temperature Zones ---
+    # --- Warehouse Temperature Zones ---
     if match([
     r"\btemp\b", r"temperture", r"temperature", r"temperature zones", r"warehouse temp", 
     r"warehouse temperature", r"cold room", r"freezer room", r"ambient temperature",
@@ -550,6 +669,48 @@ def chat():
         "🔵 **Cold Room**: +2°C to +8°C — for food and pharmaceuticals\n"
         "🔴 **Freezer Room**: –22°C — for frozen goods and sensitive materials\n\n"
         "All temperature-controlled areas are monitored 24/7 and GDP-compliant."})
+    
+    if match([r"chambers.*21k", r"how many.*chambers", r"warehouse.*layout", r"wh.*layout", r"warehouse.*structure", r"wh.*layout", r"\bchambers\b"]):
+        return jsonify({"reply": "There are 7 chambers in the 21K warehouse with different sizes and rack type, chambers'size start from 1000 sqm upto 5000 sqm which can accomodate upto to total 35000 cbm"})
+    if match([
+    r"warehouse activities", r"inbound process", r"outbound process", r"wh process", 
+    r"warehouse process", r"SOP", r"operation process", r"putaway", r"replenishment", 
+    r"picking", r"packing", r"cycle count", r"warehouse operations", r"warehouse workflow", 
+    r"\bwh\b.*operation", r"warehouse tasks", r"warehouse flow"]):
+        return jsonify({"reply": 
+        "Typical warehouse processes at DSV include:\n\n"
+        "1️⃣ **Inbound**: receiving, inspection, put-away\n"
+        "2️⃣ **Storage**: in racks or bulk zones\n"
+        "3️⃣ **Order Processing**: picking, packing, labeling\n"
+        "4️⃣ **Outbound**: staging, dispatch, transport coordination\n"
+        "5️⃣ **Inventory Control**: cycle counting, stock checks, and returns\n\n"
+        "Additional activities include VAS (Value Added Services), replenishment, and returns management.\n\n"
+        "All operations are fully managed through our INFOR WMS system for visibility, traceability, and efficiency."})
+    if match([
+    r"\bmhe\b", r"mhe equipment", r"material handling equipment", 
+    r"\bmachineries\b", r"\bmachinery\b", r"machines used", 
+    r"equipment", r"equipment used", r"warehouse equipment"]):
+        return jsonify({"reply": 
+        "DSV uses a wide range of **Material Handling Equipment (MHE)** for efficient warehouse and yard operations, including:\n\n"
+        "- 🚜 Forklifts (3–15T)\n"
+        "- 🎯 VNA (Very Narrow Aisle) machines\n"
+        "- 🤏 Reach Trucks\n"
+        "- 🎯 Pallet Jacks / Hand Pallets\n"
+        "- 🏗️ Cranes for heavy lift\n"
+        "- 📦 Container Lifters / Strippers\n\n"
+        "This equipment supports storage, picking, loading, and transport operations across all DSV Abu Dhabi facilities."})
+
+    if match([
+    r"\bwarehouse\b", r"\bwarehousing\b", r"warehouse info", 
+    r"tell me about warehouse", r"warehouse\?"]) and not re.search(r"(area|size|space|temperature|temp|cold|freezer)", message):
+        return jsonify({"reply": "Can you clarify what aspect of the warehouse you're asking about?..."})
+
+# --- Open Yard Space Availability ---
+    if match([
+    r"open yard.*occupancy", r"space.*open yard",r"space", r"open yard.*available", 
+    r"do we have.*open yard", r"open yard availability", r"open yard.*space", 
+    r"yard capacity", r"yard.*vacancy", r"any.*open yard.*space"]):
+        return jsonify({"reply": "For open yard occupancy, please contact Antony Jeyaraj at **antony.jeyaraj@dsv.com**. He can confirm available space and assist with pricing or scheduling a visit."})
 
     if match([r"\btapa\b", r"tapa certified", r"tapa standard", r"tapa compliance"]):
         return jsonify({"reply": "TAPA stands for Transported Asset Protection Association. It’s a global security standard for the safe handling, warehousing, and transportation of high-value goods. DSV follows TAPA-aligned practices for secure transport and facility operations, including access control, CCTV, sealed trailer loading, and secured parking."})
@@ -706,7 +867,7 @@ def chat():
 
     # --- Industry Tags (FMCG, Insurance, Healthcare, Ecommerce) ---
     if match([r"\bfmcg\b|fast moving|consumer goods"]):
-        return jsonify({"reply": "DSV provides fast turnaround warehousing for FMCG clients including dedicated racking, SKU control, and high-frequency dispatch."})
+        return jsonify({"reply": "FMCG stands for (Fast-Moving Consumer Goods) DSV provides fast turnaround warehousing for FMCG clients including dedicated racking, SKU control, and high-frequency dispatch."})
     if match([r"insurance|is insurance included|cargo insurance"]):
         return jsonify({"reply": "Insurance is not included by default in quotations. It can be arranged separately upon request."})
 
@@ -715,14 +876,12 @@ def chat():
         return jsonify({"reply": "DSV applies Lean Six Sigma principles in warehouse design and process flow to reduce waste, improve accuracy, and maximize efficiency. We implement 5S, KPI dashboards, and root-cause analysis for continuous improvement."})
 
     # --- Warehouse Activities ---
-    if match([r"warehouse activities|inbound process|outbound process|wh process|warehouse process|SOP|operation process|putaway|replenishment|picking|packing|cycle count"]):
-        return jsonify({"reply": "Warehouse activities include:\n- Inbound: receiving, inspection, putaway\n- Outbound: picking, packing, dispatch\n- Replenishment, cycle counting, returns, VAS, and system updates via WMS."})
+    
     if match([r"warehouse temp|temperature.*zone|storage temperature|cold room|freezer|ambient temp|warehouse temperature"]):
         return jsonify({"reply": "DSV provides 3 temperature zones:\n- **Ambient**: +18°C to +25°C\n- **Cold Room**: +2°C to +8°C\n- **Freezer**: –22°C\nThese zones are used for FMCG, pharmaceuticals, and temperature-sensitive products."})
     if match([r"size of our warehouse|total warehouse area|total sqm|warehouse size|how big.*warehouse"]):
         return jsonify({"reply": "DSV Abu Dhabi has approx. **44,000 sqm** of warehouse space:\n- 21K in Mussafah (21,000 sqm)\n- M44 (5,760 sqm)\n- M45 (5,000 sqm)\n- Al Markaz in Hameem (12,000 sqm)\nPlus 360,000 sqm of open yard."})
-    if match([r"\bwh process\b", r"warehouse process", r"warehouse operations", r"warehouse workflow", r"\bwh\b.*operation", r"warehouse tasks", r"warehouse flow"]):
-        return jsonify({"reply": "Typical warehouse processes at DSV include:\n1️⃣ **Inbound**: receiving, inspection, put-away\n2️⃣ **Storage**: in racks or bulk zones\n3️⃣ **Order Processing**: picking, packing, labeling\n4️⃣ **Outbound**: staging, dispatch, transport coordination\n5️⃣ **Inventory Control**: cycle counting, stock checks, and returns\n\nAll activities are managed through our INFOR WMS system for full visibility and traceability."})
+    
     if match([r"kitting", r"assembly", r"kitting and assembly", r"value added kitting"]):
         return jsonify({"reply": "DSV provides **kitting and assembly** as a Value Added Service:\n- Combine multiple SKUs into kits\n- Light assembly of components\n- Repacking and labeling\n- Ideal for retail, pharma, and project logistics"})
     if match([r"packing material", r"what packing material", r"materials used for packing"]):
@@ -845,9 +1004,16 @@ def chat():
         "Once these details are available, you can proceed to fill the main form to generate a quotation."})
     if match([r"proposal|quotation|offer|quote.*open yard|proposal.*open yard|send me.*quote|how to get quote|need.*quotation"]):
         return jsonify({"reply": "To get a full quotation, please close this chat and fill the details in the main form on the left. The system will generate a downloadable document for you."})
- # --- service ---
-    if match([r"\bwhat is 2pl\b", r"\b2pl\b", r"second party logistics", r"what is 2pl", r"2pl meaning"]):
-        return jsonify({"reply": "2PL (Second Party Logistics) refers to transport-only logistics providers. DSV’s 2PL services include dedicated trucking, container movement, and distribution across the UAE and GCC using our own fleet."})
+
+# --- service ---
+    if match([r"\bwhat is 2pl\b", r"\b2pl\b", r"second party logistics", r"2pl meaning"]):
+        return jsonify({"reply": 
+        "**2PL (Second Party Logistics)** means the customer rents or leases a warehouse or yard facility, but operates it entirely on their own.\n\n"
+        "- DSV provides only the **infrastructure** (space, utilities, security)\n"
+        "- The client uses their **own manpower, MHE, WMS, and processes**\n"
+        "- DSV does **not** get involved in the daily operations\n\n"
+        "This is commonly used by clients who want full control over their logistics operations, but need a compliant facility with strategic location."})
+
     if match([r"\bwhat is 3pl\b", r"\b3pl\b", r"third party logistics"]):
         return jsonify({"reply": "3PL (Third Party Logistics) involves outsourcing logistics operations such as warehousing, transportation, picking/packing, and order fulfillment to a provider like DSV."})
     if match([r"\bwhat is 4pl\b", r"\b4pl\b", r"fourth party logistics"]):
@@ -901,51 +1067,48 @@ def chat():
 
     # --- All Transport Terms & Conditions ---
     if match([
-    r"all.*transport.*terms", r"transport.*terms.*conditions", r"full.*transport.*terms", r"all.*conditions",
-    r"list.*transport.*terms", r"all.*transport.*charges", r"transport.*policy", r"complete.*transport.*info",
-    r"full.*transport.*conditions", r"all.*included", r"show.*everything.*transport", r"transport.*rules"]):
+    r"transport.*t.?&.?c", r"transportation.*terms", r"transport.*conditions", r"transport.*policy", 
+    r"delivery terms", r"transport.*rules", r"transport.*regulations", r"transportation t and c", 
+    r"terms and conditions.*transport", r"terms.*logistics", r"truck.*t.?&.?c"]):
         return jsonify({"reply":
-        "**📦 Full Transportation Terms & Conditions:**\n\n"
-        "🚛 **General Notes:**\n"
-        "- Cargo height must not exceed truck limits (side sticks/headboard)\n"
-        "- Permit-required locations (e.g., city limits) need 2–3 working days processing\n"
-        "- Short-distance trips require loading and delivery on the same day\n\n"
-        "📅 **Validity:**\n"
-        "- Quotation valid for **15 days** from issuance\n\n"
-        "💸 **Additional Fees:**\n"
-        "- VAT: 5%\n"
-        "- Environmental Fee: AED 10 per trip/truck\n"
-        "- From Jan 2025: 0.15% of invoice value\n\n"
-        "📜 **Terms & Conditions:**\n"
-        "- On FOT-to-FOT basis (Free On Truck at both ends)\n"
-        "- Per trip per truck\n"
-        "- General cargo only\n"
-        "- Based on provided location; any changes require re-quote\n"
-        "- Valid only for stable, non-sandy, flat laydown areas\n"
-        "- Subject to truck availability at time of request\n"
-        "- Based on standard truck dimensions & UAE law\n"
-        "- Subject to DSV Standard Terms & Conditions\n"
-        "- Customer handles loading, offloading, supervision\n"
-        "- Sharjah/Ajman require Municipality permission\n"
-        "- Detention: AED 150/hour after free period\n"
-        "- Backhaul (same-day): +60%; next-day: full rate\n"
-        "- Sundays/Holidays: trip rate + 50%\n"
-        "- Force majeure applies to uncontrollable delays (weather, etc.)\n"
-        "- Point of contact, site hours, and map must be provided 48 hours in advance\n"
-        "- Prior notice of 24–48 hours is required for loading\n\n"
-        "✅ **Inclusions:**\n"
-        "- Fuel (diesel)\n"
-        "- DSV equipment & personnel insurance\n\n"
-        "❌ **Exclusions (billed as actuals):**\n"
-        "- Loading, offloading, supervision\n"
-        "- Port charges, gate passes, permits\n"
-        "- Cargo insurance\n"
-        "- Road tolls, road tax, customs, VGM, washing charges\n\n"
-        "❌ **Cancellation Charges:**\n"
-        "- 50% if cancelled before truck placement\n"
-        "- 100% if cancelled after truck placement\n"
-        "- Waived if cancelled 24 hours in advance\n\n"
-        "Let me know if you'd like clarification on any specific point."})
+    "**📦 Full Transportation Terms & Conditions:**\n\n"
+    "🚛 **General Notes:**\n"
+    "- Cargo height must not exceed truck limits (side sticks/headboard)\n"
+    "- Permit-required locations (e.g., city limits) need 2–3 working days processing\n"
+    "- Short-distance trips require loading and delivery on the same day\n\n"
+    "📅 **Validity:**\n"
+    "- Quotation valid for **15 days** from issuance\n\n"
+    "💸 **Additional Fees:**\n"
+    "- VAT: 5%\n"
+    "- Environmental Fee: AED 10/trip/truck\n"
+    "- From Jan 2025: 0.15% of invoice value\n\n"
+    "📜 **Terms & Conditions:**\n"
+    "- On FOT-to-FOT basis (Free On Truck at both ends)\n"
+    "- Per trip per truck\n"
+    "- General cargo only\n"
+    "- Based on provided location — any changes require re-quote\n"
+    "- Valid only for stable, flat, non-sandy areas\n"
+    "- Subject to truck availability\n"
+    "- Based on standard UAE truck specs\n"
+    "- Loading/offloading under **customer scope**\n"
+    "- Sharjah/Ajman require Municipality permissions\n"
+    "- Detention: AED 150/hour after free period\n"
+    "- Backhaul (same-day): +60% / next-day: full rate\n"
+    "- Sundays/Holidays: trip rate +50%\n"
+    "- Force majeure applies to delays from weather, traffic, etc.\n"
+    "- Site details, maps, and contact must be provided 48 hours prior\n\n"
+    "✅ **Inclusions:**\n"
+    "- Fuel (Diesel)\n"
+    "- DSV equipment & personnel insurance\n\n"
+    "❌ **Exclusions (billed at actuals):**\n"
+    "- Loading, offloading, supervision\n"
+    "- Port charges, gate passes, tolls, permits\n"
+    "- Cargo insurance, customs, VGM, washing\n\n"
+    "❌ **Cancellation Charges:**\n"
+    "- 50% if cancelled **before** truck placement\n"
+    "- 100% if cancelled **after** truck placement\n"
+    "- Waived if cancelled **24 hours** in advance\n\n"
+    "Let me know if you'd like clarification on any specific point."})
     
     if match([r"\bfleet\b", r"\bdsv fleet\b",r"\bdsv transportation\b", r"truck fleet", r"transport fleet", r"fleet info"]):
         return jsonify({"reply": "DSV operates a large fleet in the UAE including:\n- Flatbed trailers\n- Box trucks\n- Double trailers\n- Refrigerated trucks (chiller/freezer)\n- Lowbeds\n- Tippers\n- Small city delivery trucks\nFleet vehicles support all types of transport including full truckload (FTL), LTL, and container movements."})
@@ -1114,9 +1277,7 @@ def chat():
     if match([r"summer break|midday break|working hours summer|12.*3.*break|uae heat ban|no work afternoon|hot season schedule"]):
         return jsonify({"reply": "DSV complies with UAE summer working hour restrictions. From June 15 to September 15, all outdoor work (including open yard and transport loading) is paused daily between 12:30 PM and 3:30 PM. This ensures staff safety and follows MOHRE guidelines."})
     # --- Client Name Queries ---
-    if match([r"chambers.*21k", r"how many.*chambers", r"warehouse.*layout", r"wh.*layout", r"warehouse.*structure", r"wh.*layout", r"\bchambers\b"]):
-        return jsonify({"reply": "There are 7 chambers in the 21K warehouse with different sizes and rack type, chambers'size start from 1000 sqm upto 5000 sqm which can accomodate upto to total 35000 cbm"})
-
+    
     if match([r"who is in ch(\d+)|who is in chamber(\d+)|21K clients|warehouse clients|WH clients|client in ch(\d+)|ch\d+"]):
         ch_num = re.search(r"ch(\d+)", message)
         if ch_num:
