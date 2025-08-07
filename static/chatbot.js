@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     msgsEl.scrollTop = msgsEl.scrollHeight;
 
     if (!typewriter) {
-      bubble.textContent = text;
+      bubble.innerHTML = text;
     } else {
       let i = 0;
       (function typeChar() {
@@ -69,3 +69,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+
