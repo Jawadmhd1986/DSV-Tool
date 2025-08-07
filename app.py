@@ -1188,7 +1188,7 @@ def chat():
         "📍 <strong>DSV Abu Dhabi Location:</strong><br>"
         "M-19, Mussafah Industrial Area, Abu Dhabi, UAE<br>"
         "📞 +971 2 555 2900<br><br>"
-        "🗺️ <a href='https://goo.gl/maps/tnFcmydbvdJ9gGLy8' target='_blank'>Open on Google Maps</a>"})
+        "🗺️ <a href=\"https://goo.gl/maps/tnFcmydbvdJ9gGLy8\" target=\"_blank\" rel=\"noopener noreferrer\">Open on Google Maps</a>"})
 
     # --- Friendly Chat ---
     if match([r"\bhello\b|\bhi\b|\bhey\b|good morning|good evening"]):
