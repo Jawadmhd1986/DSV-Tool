@@ -682,6 +682,15 @@ def chat():
         "- Environmental compliance (ISO 14001)\n\n"
         "Visit [dsv.com](https://www.dsv.com) to learn more about our global goals and ESG initiatives."})
 
+# --- DSV Abu Dhabi Location with Map ---
+    if match([
+    r"dsv abu dhabi location", r"where is dsv abu dhabi", r"ds v abu dhabi map", r"show location dsv abu dhabi",
+    r"ds v abu dhabi", r"where are you located in abu dhabi"]):
+        return jsonify({
+        "reply": "Here’s where our Abu Dhabi office is located:",
+        "image": "<google‑maps‑style image or snippet>",
+        "text_below": "DSV Abu Dhabi office:\nM‑19, Mussafah Industrial Area, 93971 Abu Dhabi, UAE\n\nYou can use the interactive map above to get directions or explore nearby."})
+
     # --- What does DSV mean ---
     if not re.search(r"(wms|warehouse management|abu dhabi|fleet|transport|vision|mission)", message) and match([
     r"\bdsv\b", r"about dsv", r"who is dsv", r"what is dsv", 
@@ -1171,6 +1180,14 @@ def chat():
         "- 🏢 **Al Markaz (Hameem)** – 12,000 sqm\n"
         "- 🏗 **Open Yard (Mussafah + KIZAD)** – 360,000 sqm\n\n"
         "In total: **~44,000 sqm** of covered warehouse and **481,000 sqm** logistics site including service roads."})
+
+# --- Quotation Request Redirect ---
+    if match([
+    r"quotation", r"quote", r"proposal", r"need.*quotation", r"send.*quote", r"get.*quote", r"give.*quote", 
+    r"generate.*quotation", r"quotation.*open yard", r"quote.*chemical", r"quote.*storage", r"quotation.*required"]):
+        return jsonify({"reply":
+        "To generate a proper quotation, please close this chat and fill the required details in the form on the left of the main page.\n\n"
+        "✅ Once submitted, the system will automatically generate a customized document for you to download."})
 
     # --- Friendly Chat ---
     if match([r"\bhello\b|\bhi\b|\bhey\b|good morning|good evening"]):
