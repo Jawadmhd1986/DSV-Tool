@@ -682,17 +682,8 @@ def chat():
         "- Environmental compliance (ISO 14001)\n\n"
         "Visit [dsv.com](https://www.dsv.com) to learn more about our global goals and ESG initiatives."})
 
-# --- DSV Abu Dhabi Location with Map ---
-    if match([
-    r"dsv abu dhabi location", r"where is dsv abu dhabi", r"ds v abu dhabi map", r"show location dsv abu dhabi",
-    r"ds v abu dhabi", r"where are you located in abu dhabi"]):
-        return jsonify({
-        "reply": "Here’s where our Abu Dhabi office is located:",
-        "image": "<google‑maps‑style image or snippet>",
-        "text_below": "DSV Abu Dhabi office:\nM‑19, Mussafah Industrial Area, 93971 Abu Dhabi, UAE\n\nYou can use the interactive map above to get directions or explore nearby."})
-
     # --- What does DSV mean ---
-    if not re.search(r"(wms|warehouse management|abu dhabi|fleet|transport|vision|mission)", message) and match([
+    if not re.search(r"(wms|warehouse management|abu dhabi|fleet|transport|vision|mission|location|address|site)", message) and match([
     r"\bdsv\b", r"about dsv", r"who is dsv", r"what is dsv", 
     r"dsv info", r"tell me about dsv", r"dsv overview", 
     r"dsv abbreviation", r"dsv stands for", r"what does dsv mean"]):
@@ -1188,6 +1179,13 @@ def chat():
         return jsonify({"reply":
         "To generate a proper quotation, please close this chat and fill the required details in the form on the left of the main page.\n\n"
         "✅ Once submitted, the system will automatically generate a customized document for you to download."})
+
+# --- DSV Abu Dhabi Short Location Response ---
+    if match([
+    r"dsv location", r"dsv abu dhabi location", r"where is dsv", r"dsv address", r"main office location", 
+    r"where is dsv abu dhabi", r"location of dsv", r"where.*dsv.*located", r"head office address"]):
+        return jsonify({"reply":
+        "📍 **DSV Abu Dhabi Location:** M-19, Mussafah Industrial Area, Abu Dhabi, UAE.\n\n📞 +971 2 555 2900"})
 
     # --- Friendly Chat ---
     if match([r"\bhello\b|\bhi\b|\bhey\b|good morning|good evening"]):
