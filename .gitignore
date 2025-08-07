@@ -1,9 +1,0 @@
-# Python cache
-__pycache__/
-*.py[cod]
-
-# Env file (keep secrets local)
-.env
-
-# Generated documents
-generated/
