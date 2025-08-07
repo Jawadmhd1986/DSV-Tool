@@ -565,7 +565,7 @@ def chat():
     r"\bdsv\b", r"about dsv", r"who is dsv", r"what is dsv", 
     r"dsv info", r"tell me about dsv", r"dsv overview", 
     r"dsv abbreviation", r"dsv stands for", r"what does dsv mean"]):
-    return jsonify({"reply":
+        return jsonify({"reply":
         "DSV stands for **'De Sammensluttede Vognmænd'**, meaning **'The Consolidated Hauliers'** in Danish. "
         "Founded in 1976, DSV is a global logistics leader operating in over 80 countries."})
 
