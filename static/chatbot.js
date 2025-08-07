@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let i = 0;
       (function typeChar() {
         if (i < text.length) {
-          bubble.textContent += text.charAt(i++);
+          bubble.innerHTML += text.charAt(i++);
           msgsEl.scrollTop = msgsEl.scrollHeight;
           setTimeout(typeChar, 15);
         }
@@ -69,4 +69,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+
 
