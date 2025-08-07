@@ -40,7 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({ message: text })
       });
       const { reply } = await res.json();
-      appendMessage('bot', reply, true);
+      const hasHTML = /<[^>]+>/.test(reply);
+      appendMessage('bot', reply, !hasHTML);
     } catch {
       appendMessage('bot', 'Sorry, something went wrong.');
     }
@@ -69,5 +70,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
-
-
