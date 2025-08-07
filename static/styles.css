@@ -27,7 +27,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 6rem 2rem 2rem;  /* top | sides | bottom */
+  padding: 6rem 2rem 2rem;
 }
 
 /* Logo floating above the card */
@@ -43,7 +43,7 @@ body {
 .quote-card {
   background: var(--white);
   border-radius: 12px;
-  padding: 1rem 1.5rem 1rem;  /* top | sides | bottom */
+  padding: 1rem 1.5rem 1rem;
   width: 100%;
   max-width: 420px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.2);
@@ -113,14 +113,14 @@ body {
   height: 36px;
 }
 
-/* Chat widget container with max-height */
+/* Chat widget container */
 .chat-box {
   position: fixed;
   bottom: 6rem;
   right: 2rem;
   width: 300px;
   max-width: 90%;
-  max-height: 70vh;              /* cap height at 70% of viewport */
+  max-height: 70vh;
   background: var(--white);
   border-radius: 10px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.2);
@@ -134,6 +134,8 @@ body {
 .chat-box.open {
   transform: translateY(0);
 }
+
+/* Chat header */
 .chat-header {
   background: var(--blue-dsv);
   color: var(--white);
@@ -151,7 +153,7 @@ body {
   cursor: pointer;
 }
 
-/* Message list fills remaining space and scrolls */
+/* Chat message area */
 .chat-messages {
   flex: 1;
   padding: 0.75rem 1rem;
@@ -179,9 +181,17 @@ body {
   border-radius: 16px 16px 16px 4px;
   float: left;
   max-width: 80%;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.message.bot .bubble a {
+  color: #002664;
+  text-decoration: underline;
+  word-break: break-word;
 }
 
-/* Chat input footer */
+/* Chat input */
 .chat-footer {
   display: flex;
   border-top: 1px solid #ccc;
@@ -223,30 +233,9 @@ body {
     bottom: 5rem;
     right: 5%;
   }
-
-  /* 🟦 Add this block: */
   .chat-toggle {
-    bottom: env(safe-area-inset-bottom, 1.8rem); /* raise above iPhone home bar */
+    bottom: env(safe-area-inset-bottom, 1.8rem);
     right: 1rem;
     z-index: 2000;
   }
- 
-  /* Fix for long links and HTML rendering inside bot bubbles */
-.message.bot .bubble a {
-  color: #002664;             /* DSV blue */
-  text-decoration: underline;
-  word-break: break-word;
 }
-
-.message.bot .bubble {
-  white-space: normal;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-}
-
-}
-
-
-
-
-
