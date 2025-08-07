@@ -1,9 +1,9 @@
 :root {
-  --blue-dsv:       #002c77;
-  --blue-dsv-light: #00389b;
+  --blue-dsv:       #002664;
+  --blue-dsv-light: #4B87E0;
   --white:          #ffffff;
   --grey-bg:        #f0f0f0;
-  --text-dsv:       #002c77;
+  --text-dsv:       #002664;
 }
 
 /* Reset & base */
@@ -231,6 +231,7 @@ body {
     z-index: 2000;
   }
 }
+
 
 
 
