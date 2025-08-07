@@ -322,6 +322,10 @@ def chat():
         "- Length: 12.2m, Width: 2.44m, Height: 2.59m\n"
         "- Capacity: ~67 CBM\n\n"
         "Let me know if you want 20ft specs or details for sea/road use!"})
+    if match([
+    r"\bcontainers?\b", r"container types", r"types of containers",
+    r"container sizes", r"container overview", r"container specs"]):
+        return jsonify({"reply": "📦 Here are the main container types and their specs: 20ft, 40ft, High Cube, Reefer, Flat Rack, Open Top, SME... Let me know which you'd like in detail."})
 
     # --- Open Top Container (Flexible) ---
     if match([
@@ -1113,6 +1117,35 @@ def chat():
         return jsonify({"reply": "DSV operates a large fleet in the UAE including:\n- Flatbed trailers\n- Box trucks\n- Double trailers\n- Refrigerated trucks (chiller/freezer)\n- Lowbeds\n- Tippers\n- Small city delivery trucks\nFleet vehicles support all types of transport including full truckload (FTL), LTL, and container movements."})
     if match([r"truck types", r"trucks", r"transportation types", r"dsv trucks", r"transport.*available", r"types of transport", r"trucking services"]):
         return jsonify({"reply": "DSV provides local and GCC transportation using:\n- Flatbeds for general cargo\n- Lowbeds for heavy equipment\n- Tippers for construction bulk\n- Box trucks for secure goods\n- Refrigerated trucks for temperature-sensitive cargo\n- Double trailers for long-haul\n- Vans and city trucks for last-mile delivery."})
+    # === Individual Truck Types ===
+
+    if match([r"reefer truck", r"refrigerated truck", r"chiller truck", r"cold truck"]):
+        return jsonify({"reply":
+        "❄️ **Reefer Truck**: Temperature-controlled vehicle used to transport cold chain goods like food, pharmaceuticals, and chemicals.\n"
+        "DSV reefer trucks operate between +2°C to –22°C and are equipped with GPS and real-time temperature tracking."})
+    if match([r"flatbed", r"flatbed truck", r"what is flatbed", r"flatbed trailer"]):
+        return jsonify({"reply":
+        "🚛 **Flatbed Truck**: An open platform truck ideal for transporting heavy, oversized, or palletized cargo.\n"
+        "Commonly used for containers, steel, and construction materials.\n"
+        "Max capacity: ~22–25 tons."})
+    if match([r"lowbed", r"low bed", r"lowbed trailer", r"what is lowbed"]):
+        return jsonify({"reply":
+        "🏗 **Lowbed Trailer**: Specialized truck used for transporting heavy equipment and oversized machinery.\n"
+        "Has a lower deck height for tall cargo. Capacity up to 60 tons.\n"
+        "Ideal for construction, infrastructure, and oil & gas projects."})
+    if match([r"box truck", r"closed truck", r"curtainside truck", r"box type truck"]):
+        return jsonify({"reply":
+        "📦 **Box Truck**: Enclosed truck used for transporting general cargo protected from weather.\n"
+        "Typically used for FMCG, electronics, retail, and secure goods.\n"
+        "Capacity: ~5–10 tons."})
+    if match([r"double trailer", r"articulated trailer", r"tandem trailer", r"double trailer truck"]):
+        return jsonify({"reply":
+        "🚚 **Double Trailer**: Articulated truck with two trailers, used for long-distance, high-volume transport.\n"
+        "Can carry up to 50–60 tons total. Ideal for inter-emirate and GCC deliveries."})
+    if match([r"tipper", r"tippers", r"tipper truck", r"dump truck"]):
+        return jsonify({"reply":
+        "🪨 **Tipper Truck**: Used for transporting and unloading bulk materials like sand, gravel, or soil.\n"
+        "DSV tippers typically carry 15–20 tons and are commonly used in construction logistics."})
     if match([r"\btransportation\b", r"tell me about transportation", r"transport services", r"what is transportation", r"dsv transportation"]):
         return jsonify({"reply":
         "DSV offers full-service land transportation across the UAE and GCC. We operate a modern fleet including:\n"
