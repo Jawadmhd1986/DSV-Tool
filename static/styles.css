@@ -230,7 +230,22 @@ body {
     right: 1rem;
     z-index: 2000;
   }
+ 
+  /* Fix for long links and HTML rendering inside bot bubbles */
+.message.bot .bubble a {
+  color: #002664;             /* DSV blue */
+  text-decoration: underline;
+  word-break: break-word;
 }
+
+.message.bot .bubble {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+}
+
 
 
 
