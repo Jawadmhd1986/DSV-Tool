@@ -260,6 +260,39 @@ def chat():
         "🟨 **Euro Pallet**:\n- Size: 1.2m × 0.8m\n- Load capacity: ~800 kg\n- Fits **21 pallets per bay**\n\n"
         "Pallets are used for racking, picking, and transport. DSV also offers VAS like pallet loading, shrink wrapping, labeling, and stretch film wrapping for safe handling."})
 
+# --- Full VAS List (All Categories) ---
+    if match([
+    r"all vas", r"give me all vas", r"list all vas", r"show all vas", r"full vas list",
+    r"all value added services", r"show me all value added services", r"vas full list", r"complete vas list"]):
+        return jsonify({"reply":
+        "**📦 Standard VAS:**\n"
+        "- In/Out Handling: 20 AED/CBM\n"
+        "- Pallet Loading: 12 AED/pallet\n"
+        "- Documentation: 125 AED/set\n"
+        "- Packing with pallet: 85 AED/CBM\n"
+        "- Inventory Count: 3,000 AED/event\n"
+        "- Case Picking: 2.5 AED/carton\n"
+        "- Sticker Labeling: 1.5 AED/label\n"
+        "- Shrink Wrapping: 6 AED/pallet\n"
+        "- VNA Usage: 2.5 AED/pallet\n\n"
+        "**🧪 Chemical VAS:**\n"
+        "- Handling (Palletized): 20 AED/CBM\n"
+        "- Handling (Loose): 25 AED/CBM\n"
+        "- Documentation: 150 AED/set\n"
+        "- Packing with pallet: 85 AED/CBM\n"
+        "- Inventory Count: 3,000 AED/event\n"
+        "- Inner Bag Picking: 3.5 AED/bag\n"
+        "- Sticker Labeling: 1.5 AED/label\n"
+        "- Shrink Wrapping: 6 AED/pallet\n\n"
+        "**🏗 Open Yard VAS:**\n"
+        "- Forklift (3T–7T): 90 AED/hr\n"
+        "- Forklift (10T): 200 AED/hr\n"
+        "- Forklift (15T): 320 AED/hr\n"
+        "- Mobile Crane (50T): 250 AED/hr\n"
+        "- Mobile Crane (80T): 450 AED/hr\n"
+        "- Container Lifting: 250 AED/lift\n"
+        "- Container Stripping (20ft): 1,200 AED/hr"})
+
     # --- All Storage Rates at Once ---
     if match([
     r"\ball\b",r"all.*storage.*rates", r"complete.*storage.*rate", r"all.*rate", r"list.*storage.*fees",
@@ -292,9 +325,18 @@ def chat():
 
     if match([r"standard non ac", r"non ac standard", r"standard non ac storage"]):
         return jsonify({"reply": "Standard Non-AC storage is 2.0 AED/CBM/day. Standard VAS applies."})
+# --- Follow-up replies after "standard" ---
+    if match([r"^ac$", r"\bstandard ac\b", r"ac storage", r"ac only"]):
+        return jsonify({"reply": "Standard AC storage is 2.5 AED/CBM/day. Standard VAS applies."})
 
-    if match([r"open shed", r"standard open shed", r"open shed storage rate"]):
+    if match([r"^non ac$", r"\bstandard non ac\b", r"non-ac storage", r"non ac only"]):
+        return jsonify({"reply": "Standard Non-AC storage is 2.0 AED/CBM/day. Standard VAS applies."})
+
+    if match([r"^shed$", r"open shed", r"shed storage", r"open shed only"]):
         return jsonify({"reply": "Open Shed storage is 1.8 AED/CBM/day. Standard VAS applies."})
+
+        if match([r"open shed", r"standard open shed", r"open shed storage rate"]):
+            return jsonify({"reply": "Open Shed storage is 1.8 AED/CBM/day. Standard VAS applies."})
 
 # --- Chemical Storage Follow-up ---
     if match([r"^chemical$", r"chemical storage only"]):
@@ -304,6 +346,12 @@ def chat():
         return jsonify({"reply": "Chemical AC storage is 3.5 AED/CBM/day. Chemical VAS applies."})
 
     if match([r"chemical non ac", r"non ac chemical", r"chemical non ac storage", r"chemical non ac rate"]):
+        return jsonify({"reply": "Chemical Non-AC storage is 2.7 AED/CBM/day. Chemical VAS applies."})
+# --- Follow-up replies after "chemical" ---
+    if match([r"^chemical ac$", r"chemical ac only", r"ac chemical", r"chemical ac storage", r"^ac$"]):
+        return jsonify({"reply": "Chemical AC storage is 3.5 AED/CBM/day. Chemical VAS applies."})
+
+    if match([r"^chemical non ac$", r"non-ac chemical", r"chemical non ac storage", r"^non ac$"]):
         return jsonify({"reply": "Chemical Non-AC storage is 2.7 AED/CBM/day. Chemical VAS applies."})
 
 # --- Open Yard Storage ---
@@ -322,6 +370,15 @@ def chat():
 
     # --- vas Rate ---
     if match([
+    r"\bvas\b", r"what is vas", r"vas meaning", r"value added services", r"explain vas"]):
+        return jsonify({"reply":
+        "VAS stands for **Value Added Services**. Can you please specify which one you're referring to?\n\n"
+        "- 🟦 Standard VAS (for AC/Non-AC/Open Shed)\n"
+        "- 🧪 Chemical VAS\n"
+        "- 🏗 Open Yard VAS\n\n"
+        "Let me know and I’ll share the full list of charges!"})
+
+    if match([
     r"standard vas", r"standard", r"standard value added services", r"normal vas", r"normal value added services",
     r"handling charges", r"pallet charges", r"vas for ac", r"value added services for ac",
     r"vas for non ac", r"value added services for non ac",
@@ -335,10 +392,60 @@ def chat():
     r"dangerous goods vas", r"dangerous goods value added services"]):
         return jsonify({"reply": "Chemical VAS includes:\n- Handling (Palletized): 20 AED/CBM\n- Handling (Loose): 25 AED/CBM\n- Documentation: 150 AED/set\n- Packing with pallet: 85 AED/CBM\n- Inventory Count: 3,000 AED/event\n- Inner Bag Picking: 3.5 AED/bag\n- Sticker Labeling: 1.5 AED/label\n- Shrink Wrapping: 6 AED/pallet"})
 
+# --- Open Yard Overview & Size ---
+    if match([
+    r"open yard size", r"how big.*open yard", r"open yard area", r"open yard total", r"yard capacity",
+    r"tell me about the open yard", r"open yard details", r"open yard info", r"open yard overview",
+    r"open yard facilities", r"open yard infrastructure"]):
+        return jsonify({"reply":
+        "🏗️ **DSV Open Yard Overview:**\n\n"
+        "- 📍 **Mussafah Open Yard**: 160 AED/SQM/year\n"
+        "- 📍 **KIZAD Open Yard**: 125 AED/SQM/year\n"
+        "- 🔲 **Total open yard area**: 360,000 SQM (across both sites)\n"
+        "- 🌐 Fully accessible for flatbeds, lowbeds, cranes, and containers\n"
+        "- 🔧 VAS available: forklifts, cranes, container lifting, and stripping\n\n"
+        "For availability or booking:\n📧 Contact Antony Jeyaraj at **antony.jeyaraj@dsv.com**"})
+
     if match([
     r"open yard vas", r"open yard", r"open yard value added services", r"yard equipment",
     r"forklift rate", r"crane rate", r"container lifting", r"yard charges"]):
         return jsonify({"reply": "Open Yard VAS includes:\n- Forklift (3T–7T): 90 AED/hr\n- Forklift (10T): 200 AED/hr\n- Forklift (15T): 320 AED/hr\n- Mobile Crane (50T): 250 AED/hr\n- Mobile Crane (80T): 450 AED/hr\n- Container Lifting: 250 AED/lift\n- Container Stripping (20ft): 1,200 AED/hr"})
+# --- VAS Type Clarification Responses (Single-word answers) ---
+    if match([r"^standard$", r"standard vas", r"standard value added services", r"standard service"]):
+        return jsonify({"reply": 
+        "🟦 **Standard VAS includes:**\n"
+        "- In/Out Handling: 20 AED/CBM\n"
+        "- Pallet Loading: 12 AED/pallet\n"
+        "- Documentation: 125 AED/set\n"
+        "- Packing with pallet: 85 AED/CBM\n"
+        "- Inventory Count: 3,000 AED/event\n"
+        "- Case Picking: 2.5 AED/carton\n"
+        "- Sticker Labeling: 1.5 AED/label\n"
+        "- Shrink Wrapping: 6 AED/pallet\n"
+        "- VNA Usage: 2.5 AED/pallet"})
+
+    if match([r"^chemical$", r"chemical vas", r"chemical value added services", r"chemical service"]):
+        return jsonify({"reply": 
+        "🧪 **Chemical VAS includes:**\n"
+        "- Handling (Palletized): 20 AED/CBM\n"
+        "- Handling (Loose): 25 AED/CBM\n"
+        "- Documentation: 150 AED/set\n"
+        "- Packing with pallet: 85 AED/CBM\n"
+        "- Inventory Count: 3,000 AED/event\n"
+        "- Inner Bag Picking: 3.5 AED/bag\n"
+        "- Sticker Labeling: 1.5 AED/label\n"
+        "- Shrink Wrapping: 6 AED/pallet"})
+
+    if match([r"^open yard$", r"open yard vas", r"open yard value added services", r"yard vas"]):
+        return jsonify({"reply": 
+        "🏗 **Open Yard VAS includes:**\n"
+        "- Forklift (3T–7T): 90 AED/hr\n"
+        "- Forklift (10T): 200 AED/hr\n"
+        "- Forklift (15T): 320 AED/hr\n"
+        "- Mobile Crane (50T): 250 AED/hr\n"
+        "- Mobile Crane (80T): 450 AED/hr\n"
+        "- Container Lifting: 250 AED/lift\n"
+        "- Container Stripping (20ft): 1,200 AED/hr"})
 
     # --- Storage Rate Matching ---
     if match([r"open yard.*mussafah"]):
@@ -350,7 +457,7 @@ def chat():
     if match([r"rack height|rack levels|pallets per bay|racking"]):
         return jsonify({"reply": "21K warehouse racks are 12m tall with 6 pallet levels. Each bay holds 14 Standard pallets or 21 Euro pallets."})
     if match([r"\b21k\b", r"tell me about 21k", r"what is 21k", r"21k warehouse", r"21k dsv", r"main warehouse", r"mussafah.*21k"]):
-        return jsonify({"reply": "21K is DSV’s main warehouse in Mussafah, Abu Dhabi. It is 21,000 sqm with a clear height of 15 meters. The facility features:\n- 3 rack types: Selective, VNA, and Drive-in\n- Rack height: 12m with 6 pallet levels\n- Aisle widths: Selective (2.95–3.3m), VNA (1.95m), Drive-in (2.0m)\n- 7 chambers used by clients like ADNOC, ZARA, PSN, and Civil Defense\n- Fully equipped with fire systems, access control, and RMS for document storage."})
+        return jsonify({"reply": "21K is DSV’s main warehouse in Mussafah, Abu Dhabi. It is 21,000 sqm with a clear height of 15 meters. The facility features:\n- 3 rack types: Selective, VNA, and Drive-in\n- Rack height: 12m with 6 pallet levels\n- Aisle widths: Selective (2.95–3.3m), VNA (1.95m), Drive-in (2.0m)\n- 7 chambers used by clients like ADNOC, ZARA, PSN, and Civil Defense\n- Fully equipped with fire systems, access control, and RMS for document storage chambers'size start from 1000 sqm upto 5000 sqm which can accomodate upto to total 35000 cbm."})
     if match([r"\bgdsp\b", r"what is gdsp", r"gdsp certified", r"gdsp warehouse", r"gdsp compliance"]):
         return jsonify({"reply": "GDSP stands for Good Distribution and Storage Practices. It ensures that warehouse operations comply with global standards for the safe handling, storage, and distribution of goods, especially pharmaceuticals and sensitive materials. DSV’s warehouses in Abu Dhabi are GDSP certified."})
     if match([r"\biso\b", r"what iso", r"iso certified", r"tell me about iso", r"dsv iso", r"which iso standards"]):
@@ -560,8 +667,23 @@ def chat():
         "📍 **Airport Freezone** – Pharma & healthcare storage\n\n"
         "We handle 2PL, 3PL, 4PL logistics, WMS, VAS, and temperature-controlled storage. Contact +971 2 555 2900 or visit [dsv.com](https://www.dsv.com)."})
 
+# --- DSV Vision and Mission ---
+    if match([
+    r"dsv vision", r"what is dsv vision", r"dsv mission", r"dsv mission and vision",
+    r"company vision", r"company mission", r"mission statement", r"vision statement", r"vision of dsv"]):
+        return jsonify({"reply":
+        "**DSV’s Vision & Mission:**\n\n"
+        "🌍 **Vision:** To be a leading global supplier of transport and logistics services, meeting our customers’ needs for quality, service, and reliability.\n\n"
+        "🚀 **Mission:** We aim to deliver superior customer experiences by providing integrated logistics solutions that add value and efficiency across the supply chain.\n\n"
+        "♻️ **Sustainability Vision:** DSV is committed to reducing CO₂ emissions and achieving net-zero by 2050 through:\n"
+        "- Electric vehicle transport\n"
+        "- Solar-powered warehouses\n"
+        "- Route optimization & consolidation\n"
+        "- Environmental compliance (ISO 14001)\n\n"
+        "Visit [dsv.com](https://www.dsv.com) to learn more about our global goals and ESG initiatives."})
+
     # --- What does DSV mean ---
-    if not re.search(r"(wms|warehouse management|abu dhabi|fleet|transport|facility)", message) and match([
+    if not re.search(r"(wms|warehouse management|abu dhabi|fleet|transport|vision|mission)", message) and match([
     r"\bdsv\b", r"about dsv", r"who is dsv", r"what is dsv", 
     r"dsv info", r"tell me about dsv", r"dsv overview", 
     r"dsv abbreviation", r"dsv stands for", r"what does dsv mean"]):
@@ -849,40 +971,53 @@ def chat():
         "- ❌ Loading/unloading at either end is **not included**\n\n"
         "This term is commonly used in DSV transport quotes to define the scope of delivery responsibility."})
     
+    # --- LTL / LCL / FTL Shipping Terms ---
     if match([
     r"\bltl\b", r"less than truckload", r"ltl shipment", r"ltl meaning", r"what is ltl",
-    r"\blcl\b", r"less than container load", r"lcl shipment", r"lcl meaning", r"what is lcl"]):
+    r"\blcl\b", r"less than container load", r"lcl shipment", r"lcl meaning", r"what is lcl",
+    r"\bftl\b", r"full truckload", r"what is ftl", r"ftl meaning", r"explain ftl"]):
         return jsonify({"reply":
-        "**LTL** and **LCL** are shared-load logistics terms:\n\n"
-        "- 🚛 **LTL (Less Than Truckload)**: For road shipments that don’t fill a full truck. Your cargo shares space with others.\n"
-        "- 🚢 **LCL (Less Than Container Load)**: For sea shipments that don’t fill a full container. Cargo is consolidated with others in a single container.\n\n"
-        "DSV offers both services globally and within the UAE for cost-effective partial loads."})
+        "**Here’s a breakdown of common shipping terms:**\n\n"
+        "🚛 **LTL (Less Than Truckload)**:\n"
+        "- Road transport when cargo doesn’t fill a full truck\n"
+        "- Shared with other shipments\n"
+        "- Cost-effective for small or medium-sized loads\n\n"
+        "🚢 **LCL (Less Than Container Load)**:\n"
+        "- Sea freight where cargo doesn’t fill a container\n"
+        "- Consolidated with other customers’ cargo\n"
+        "- Ideal for partial-volume international shipments\n\n"
+        "🚛 **FTL (Full Truckload)**:\n"
+        "- Entire truck is booked for one customer\n"
+        "- Faster and more secure\n"
+        "- Best for high-volume, urgent, or dedicated deliveries\n\n"
+        "DSV offers all three options depending on your cargo size, mode, and urgency."})
+
 
     # --- UAE Emirates Distance + Travel Time (Individual Matches) ---
     if match([r"abu dhabi.*dubai|dubai.*abu dhabi"]):
-        return jsonify({"reply": "The distance between Abu Dhabi and Dubai is about **140 km**, and the travel time is approximately **1.5 hours**."})
+        return jsonify({"reply": "The distance between Abu Dhabi and Dubai is about **140 km**, and the travel time is approximately **2.5 hours**."})
     if match([r"abu dhabi.*sharjah|sharjah.*abu dhabi"]):
-        return jsonify({"reply": "The distance between Abu Dhabi and Sharjah is about **160 km**, and the travel time is approximately **1.5 to 2 hours**."})
+        return jsonify({"reply": "The distance between Abu Dhabi and Sharjah is about **160 km**, and the travel time is approximately **2.5 to 3 hours**."})
     if match([r"abu dhabi.*ajman|ajman.*abu dhabi"]):
-        return jsonify({"reply": "The distance between Abu Dhabi and Ajman is approximately **170 km**, with a travel time of about **1.5 to 2 hours**."})
+        return jsonify({"reply": "The distance between Abu Dhabi and Ajman is approximately **170 km**, with a travel time of about **2.5 to 3 hours**."})
     if match([r"abu dhabi.*ras al khaimah|ras al khaimah.*abu dhabi|rak.*abu dhabi|abu dhabi.*rak"]):
-        return jsonify({"reply": "The road distance from Abu Dhabi to Ras Al Khaimah is about **240 km**, and the travel time is around **2.5 to 3 hours**."})
+        return jsonify({"reply": "The road distance from Abu Dhabi to Ras Al Khaimah is about **240 km**, and the travel time is around **3 to 3.5 hours**."})
     if match([r"abu dhabi.*fujairah|fujairah.*abu dhabi"]):
-        return jsonify({"reply": "Abu Dhabi to Fujairah is approximately **250 km**, with a travel time of about **2.5 to 3 hours**."})
+        return jsonify({"reply": "Abu Dhabi to Fujairah is approximately **250 km**, with a travel time of about **3 to 3.5 hours**."})
     if match([r"dubai.*sharjah|sharjah.*dubai"]):
         return jsonify({"reply": "Dubai to Sharjah is around **30 km**, and the travel time is typically **30 to 45 minutes**."})
     if match([r"dubai.*ajman|ajman.*dubai"]):
-        return jsonify({"reply": "Dubai to Ajman is approximately **40 km**, and it takes around **40 to 50 minutes** by road."})
+        return jsonify({"reply": "Dubai to Ajman is approximately **40 km**, and it takes around **60 to 90 minutes** by road."})
     if match([r"dubai.*ras al khaimah|ras al khaimah.*dubai|dubai.*rak|rak.*dubai"]):
-        return jsonify({"reply": "The distance between Dubai and Ras Al Khaimah is around **120 km**, with a travel time of **1.5 to 2 hours**."})
+        return jsonify({"reply": "The distance between Dubai and Ras Al Khaimah is around **120 km**, with a travel time of **2 to 2.5 hours**."})
     if match([r"dubai.*fujairah|fujairah.*dubai"]):
-        return jsonify({"reply": "Dubai to Fujairah is approximately **130 km**, and the travel time is about **2 hours**."})
+        return jsonify({"reply": "Dubai to Fujairah is approximately **130 km**, and the travel time is about **2.5 hours**."})
     if match([r"sharjah.*ajman|ajman.*sharjah"]):
-        return jsonify({"reply": "Sharjah and Ajman are extremely close — only about **15 km**, with a travel time of **15 to 20 minutes**."})
+        return jsonify({"reply": "Sharjah and Ajman are extremely close — only about **15 km**, with a travel time of **45 to 60 minutes**."})
     if match([r"sharjah.*fujairah|fujairah.*sharjah"]):
         return jsonify({"reply": "Sharjah to Fujairah is roughly **110 km**, and takes about **2 hours** by road."})
     if match([r"sharjah.*ras al khaimah|ras al khaimah.*sharjah|sharjah.*rak|rak.*sharjah"]):
-        return jsonify({"reply": "Sharjah to Ras Al Khaimah is approximately **100 km**, and the travel time is around **1.5 to 2 hours**."})
+        return jsonify({"reply": "Sharjah to Ras Al Khaimah is approximately **100 km**, and the travel time is around **2 to 2.5 hours**."})
 
     if match([
     r"truck capacity", r"how many ton", r"truck tonnage", r"truck.*can carry", r"truck load",
@@ -1015,7 +1150,8 @@ def chat():
     if match([
     r"who are you", r"who r u", r"who.*you", r"who.*are.*you", r"what.*can.*you.*do",
     r"what can u do", r"what can you help with", r"how can you help", r"can u help", r"what can u help me with",
-    r"how u help", r"your purpose", r"your role", r"what do u do", r"what.*can.*you.*answer"]):
+    r"how u help", r"your purpose", r"your role", r"what do u do", r"what.*can.*you.*answer",
+    r"what.*assist.*me.*with", r"what.*can.*u.*assist", r"how.*can.*u.*support", r"what.*you.*do", r"how.*u.*can.*help"]):
         return jsonify({"reply":
         "I'm the DSV logistics assistant 🤖 here to help you with:\n\n"
         "- 📦 Storage rates (Standard, Chemical, Open Yard)\n"
