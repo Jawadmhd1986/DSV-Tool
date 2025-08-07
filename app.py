@@ -268,11 +268,6 @@ def chat():
         return any(re.search(p, message) for p in patterns)
     
 # --- Containers (All Types + Flexible Unit Recognition) ---
-    if match([r"healthcare|medical storage|pharma warehouse|pharma|pharmaceutical storage"]):
-        return jsonify({"reply": "DSV serves healthcare clients via temperature-controlled, GDP-compliant storage at Abu Dhabi Airport Freezone and Mussafah."})
-
-    if match([r"\bcontainers?\b", r"tell me about containers?", r"container types", r"types of containers", r"container sizes", r"container dimensions", r"container info", r"container specs"]):
-        return jsonify({"reply": "Here are the main container types and their specifications:\n\n📦 **20ft Container**:\n- Length: 6.1m, Width: 2.44m, Height: 2.59m\n- Payload: ~28,000 kg\n- Capacity: ~33 CBM\n\n📦 **40ft Container**:\n- Length: 12.2m, Width: 2.44m, Height: 2.59m\n- Payload: ~30,400 kg\n- Capacity: ~67 CBM\n\n⬆️ **40ft High Cube**:\n- Same as 40ft but height = 2.9m\n- Ideal for voluminous goods\n\n❄️ **Reefer Container (20ft & 40ft)**:\n- Insulated, temperature-controlled (+2°C to –25°C)\n- Used for food, pharma, perishables\n\n🏗 **Open Top Container**:\n- No roof, allows crane loading\n- For tall cargo (e.g. machinery, steel)\n\n🪜 **Flat Rack Container**:\n- No sides or roof\n- Used for oversized loads like vehicles or transformers\n\n📦 **SME Containers**:\n- Custom modular containers used in the UAE for small-scale import/export or temporary storage by SMEs\n\nLet me know if you'd like help choosing the right container for your cargo!"})
 
 # Specific container types with ft/feet/foot flexibility
     if match([
@@ -348,6 +343,9 @@ def chat():
 
     if match([r"\bsme\b", r"sme container", r"what is sme", r"sme size", r"sme container size"]):
         return jsonify({"reply": "In logistics, **SME** usually refers to Small and Medium Enterprises, but in UAE context, 'SME container' can also mean modular containers customized for SME use — often used for short-term cargo storage or small-scale import/export."})
+    
+    if match([r"\bcontainers?\b", r"tell me about containers?", r"container types", r"types of containers", r"container sizes", r"container dimensions", r"container info", r"container specs"]):
+        return jsonify({"reply": "Here are the main container types and their specifications:\n\n📦 **20ft Container**:\n- Length: 6.1m, Width: 2.44m, Height: 2.59m\n- Payload: ~28,000 kg\n- Capacity: ~33 CBM\n\n📦 **40ft Container**:\n- Length: 12.2m, Width: 2.44m, Height: 2.59m\n- Payload: ~30,400 kg\n- Capacity: ~67 CBM\n\n⬆️ **40ft High Cube**:\n- Same as 40ft but height = 2.9m\n- Ideal for voluminous goods\n\n❄️ **Reefer Container (20ft & 40ft)**:\n- Insulated, temperature-controlled (+2°C to –25°C)\n- Used for food, pharma, perishables\n\n🏗 **Open Top Container**:\n- No roof, allows crane loading\n- For tall cargo (e.g. machinery, steel)\n\n🪜 **Flat Rack Container**:\n- No sides or roof\n- Used for oversized loads like vehicles or transformers\n\n📦 **SME Containers**:\n- Custom modular containers used in the UAE for small-scale import/export or temporary storage by SMEs\n\nLet me know if you'd like help choosing the right container for your cargo!"})
 
     # --- Pallet Types, Sizes, and Positions ---
     if match([
@@ -698,10 +696,13 @@ def chat():
         "- 📦 Container Lifters / Strippers\n\n"
         "This equipment supports storage, picking, loading, and transport operations across all DSV Abu Dhabi facilities."})
 
+    if match([r"dsv warehouse", r"abu dhabi warehouse", r"warehouse facilities"]):
+        return jsonify({"reply": "DSV Abu Dhabi has 44,000 sqm of warehouse space across 21K, M44, M45, and Al Markaz. Main site is 21K in Mussafah (21,000 sqm, 7 chambers)."})
+
     if match([
     r"\bwarehouse\b", r"\bwarehousing\b", r"warehouse info", 
-    r"tell me about warehouse", r"warehouse\?"]) and not re.search(r"(area|size|space|temperature|temp|cold|freezer)", message):
-        return jsonify({"reply": "Can you clarify what aspect of the warehouse you're asking about?..."})
+    r"tell me about warehouse", r"warehouse\?"]) and not re.search(r"(area|size|space|temperature|temp|cold|freezer|wms|dsv|location|rack|21k|chamber|operations|facility|facilities)", message):
+        return jsonify({"reply": "Can you clarify what aspect of the warehouse you're asking about? Size, temp zones, racking, chambers, or something else?"})
 
 # --- Open Yard Space Availability ---
     if match([
