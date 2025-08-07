@@ -262,7 +262,7 @@ text = re.sub(r"\blabelling\b", "labeling", text)
 # Strip non-alphanumeric except spaces and periods
 text = re.sub(r"[^a-z0-9\s\.]", "", text)
 
-        return text
+    return text
 
     message = normalize(message)
 
