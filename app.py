@@ -379,8 +379,11 @@ def chat():
         "- Mussafah: 160 AED/SQM/year\n\n"
         "*WMS fee applies to indoor storage unless excluded. For full quotation, fill out the form.*"})
 
-    # --- Storage Rate Initial Question ---
-    if match([r"storage rate[s]?$", r"\brates\b", r"storage", r"storage cost", r"how much.*storage", r"quotation.*storage only"]):
+   # --- Storage Rate Initial Question ---
+    if match([
+    r"storage rate[s]?$", r"\brates\b", r"storage", r"storage cost",
+    r"how much.*storage", r"quotation.*storage only", r"rates", r"rate",
+    r"pricing of storage", r"cost of storage", r"rate for storage", r"all storage rates"]) and not re.search(r"vas|value added", message):
         return jsonify({"reply": "Which type of storage are you asking about? Standard, Chemicals, or Open Yard?"})
 
 # --- Standard Storage Follow-up ---
@@ -392,7 +395,8 @@ def chat():
 
     if match([r"standard non ac", r"non ac standard", r"standard non ac storage"]):
         return jsonify({"reply": "Standard Non-AC storage is 2.0 AED/CBM/day. Standard VAS applies."})
-# --- Follow-up replies after "standard" ---
+
+    # --- Follow-up replies after "standard" ---
     if match([r"^ac$", r"\bstandard ac\b", r"ac storage", r"ac only"]):
         return jsonify({"reply": "Standard AC storage is 2.5 AED/CBM/day. Standard VAS applies."})
 
