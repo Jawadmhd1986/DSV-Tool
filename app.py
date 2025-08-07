@@ -998,7 +998,7 @@ def chat():
             client_name = clients.get(chamber, "unknown")
             return jsonify({"reply": f"Chamber {chamber} is occupied by {client_name}."})
    
-if match([
+    if match([
     r"like what", r"such as", r"for example", r"what kind of help", r"what.*can.*you.*help.*with", 
     r"what.*do.*you.*do", r"what.*things.*you.*can.*do", r"can.*you.*give.*example", r"what.*services.*you.*offer",
     r"what.*can.*u.*do", r"what.*can.*u.*help", r"what.*you.*provide"]):
