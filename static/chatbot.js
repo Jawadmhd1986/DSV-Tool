@@ -1,9 +1,4 @@
-// static/chatbot.js
-
-// 🚀 Confirm the file is actually loading
-console.log('chatbot.js loaded');
-
-// 🔧 Fix for mobile viewport height
+// 🔧 Fix for mobile viewport height (ensures chat icon appears on load)
 window.addEventListener('load', () => {
   let vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -13,7 +8,7 @@ window.addEventListener('resize', () => {
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 });
 
-// 🧠 Main chatbot logic, fires once DOM is ready
+// 🧠 Main chatbot logic
 document.addEventListener('DOMContentLoaded', () => {
   const chatBox    = document.getElementById('chat-box');
   const chatToggle = document.querySelector('.chat-toggle');
@@ -32,12 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 🟢 Debugged sendMessage
   async function sendMessage() {
-    console.log('🟢 sendMessage() called; input=', inputEl.value);
     const text = inputEl.value.trim();
     if (!text) return;
-
     appendMessage('user', text);
     inputEl.value = '';
 
@@ -49,13 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       const { reply } = await res.json();
       appendMessage('bot', reply, true);
-    } catch (err) {
-      console.error('Chat request failed', err);
+    } catch {
       appendMessage('bot', 'Sorry, something went wrong.');
     }
   }
 
-  // Helper to append a chat bubble
   function appendMessage(sender, text, typewriter = false) {
     const wrapper = document.createElement('div');
     wrapper.className = `message ${sender}`;
@@ -69,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
       bubble.textContent = text;
     } else {
       let i = 0;
-      ;(function typeChar() {
+      (function typeChar() {
         if (i < text.length) {
           bubble.textContent += text.charAt(i++);
           msgsEl.scrollTop = msgsEl.scrollHeight;
