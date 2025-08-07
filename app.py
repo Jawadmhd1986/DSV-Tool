@@ -264,7 +264,7 @@ text = re.sub(r"[^a-z0-9\s\.]", "", text)
 
 return text
 
-    message = normalize(message)
+message = normalize(message)
 
     def match(patterns):
         return any(re.search(p, message) for p in patterns)
