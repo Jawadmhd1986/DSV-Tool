@@ -322,10 +322,6 @@ def chat():
         "- Length: 12.2m, Width: 2.44m, Height: 2.59m\n"
         "- Capacity: ~67 CBM\n\n"
         "Let me know if you want 20ft specs or details for sea/road use!"})
-    if match([
-    r"\bcontainers?\b", r"container types", r"types of containers",
-    r"container sizes", r"container overview", r"container specs"]):
-        return jsonify({"reply": "📦 Here are the main container types and their specs: 20ft, 40ft, High Cube, Reefer, Flat Rack, Open Top, SME... Let me know which you'd like in detail."})
 
     # --- Open Top Container (Flexible) ---
     if match([
@@ -348,8 +344,10 @@ def chat():
     if match([r"\bsme\b", r"sme container", r"what is sme", r"sme size", r"sme container size"]):
         return jsonify({"reply": "In logistics, **SME** usually refers to Small and Medium Enterprises, but in UAE context, 'SME container' can also mean modular containers customized for SME use — often used for short-term cargo storage or small-scale import/export."})
     
-    if match([r"\bcontainers?\b", r"tell me about containers?", r"container types", r"types of containers", r"container sizes", r"container dimensions", r"container info", r"container specs"]):
-        return jsonify({"reply": "Here are the main container types and their specifications:\n\n📦 **20ft Container**:\n- Length: 6.1m, Width: 2.44m, Height: 2.59m\n- Payload: ~28,000 kg\n- Capacity: ~33 CBM\n\n📦 **40ft Container**:\n- Length: 12.2m, Width: 2.44m, Height: 2.59m\n- Payload: ~30,400 kg\n- Capacity: ~67 CBM\n\n⬆️ **40ft High Cube**:\n- Same as 40ft but height = 2.9m\n- Ideal for voluminous goods\n\n❄️ **Reefer Container (20ft & 40ft)**:\n- Insulated, temperature-controlled (+2°C to –25°C)\n- Used for food, pharma, perishables\n\n🏗 **Open Top Container**:\n- No roof, allows crane loading\n- For tall cargo (e.g. machinery, steel)\n\n🪜 **Flat Rack Container**:\n- No sides or roof\n- Used for oversized loads like vehicles or transformers\n\n📦 **SME Containers**:\n- Custom modular containers used in the UAE for small-scale import/export or temporary storage by SMEs\n\nLet me know if you'd like help choosing the right container for your cargo!"})
+    if match([
+    r"\bcontainers?\b", r"container types", r"types of containers",
+    r"container sizes", r"container overview", r"container specs", r"container info"]):
+        return jsonify({"reply": "📦 Here are the main container types and their specs: 20ft, 40ft, High Cube, Reefer, Flat Rack, Open Top, SME... Let me know which you'd like in detail."})
 
     # --- Pallet Types, Sizes, and Positions ---
     if match([
@@ -450,6 +448,7 @@ def chat():
     if match([r"^mussafah$", r"\bmussafah\b"]):
         return jsonify({"reply": "Open Yard Mussafah storage is **160 AED/SQM/year**. WMS is excluded. For availability, contact Antony Jeyaraj at antony.jeyaraj@dsv.com."})
 
+# --- VAS rates ---
     if match([
     r"standard vas", r"standard", r"standard value added services", r"normal vas", r"normal value added services",
     r"handling charges", r"pallet charges", r"vas for ac", r"value added services for ac",
@@ -463,20 +462,6 @@ def chat():
     r"hazmat vas", r"hazmat value added services",
     r"dangerous goods vas", r"dangerous goods value added services"]):
         return jsonify({"reply": "Chemical VAS includes:\n- Handling (Palletized): 20 AED/CBM\n- Handling (Loose): 25 AED/CBM\n- Documentation: 150 AED/set\n- Packing with pallet: 85 AED/CBM\n- Inventory Count: 3,000 AED/event\n- Inner Bag Picking: 3.5 AED/bag\n- Sticker Labeling: 1.5 AED/label\n- Shrink Wrapping: 6 AED/pallet"})
-
-# --- Open Yard Overview & Size ---
-    if match([
-    r"open yard size", r"how big.*open yard", r"open yard area", r"open yard total", r"yard capacity",
-    r"tell me about the open yard", r"open yard details", r"open yard info", r"open yard overview",
-    r"open yard facilities", r"open yard infrastructure"]):
-        return jsonify({"reply":
-        "🏗️ **DSV Open Yard Overview:**\n\n"
-        "- 📍 **Mussafah Open Yard**: 160 AED/SQM/year\n"
-        "- 📍 **KIZAD Open Yard**: 125 AED/SQM/year\n"
-        "- 🔲 **Total open yard area**: 360,000 SQM (across both sites)\n"
-        "- 🌐 Fully accessible for flatbeds, lowbeds, cranes, and containers\n"
-        "- 🔧 VAS available: forklifts, cranes, container lifting, and stripping\n\n"
-        "For availability or booking:\n📧 Contact Antony Jeyaraj at **antony.jeyaraj@dsv.com**"})
 
     if match([
     r"open yard vas", r"open yard", r"open yard value added services", r"yard equipment",
@@ -554,13 +539,14 @@ def chat():
 
 # --- vas Rate ---
     if match([
-    r"\bvas\b", r"what is vas", r"vas meaning", r"value added services", r"explain vas"]):
+    r"\bvas\b", r"vas rates", r"what is vas", r"vas meaning", r"value added services", r"explain vas"]):
         return jsonify({"reply":
         "VAS stands for **Value Added Services**. Can you please specify which one you're referring to?\n\n"
         "- 🟦 Standard VAS (for AC/Non-AC/Open Shed)\n"
         "- 🧪 Chemical VAS\n"
         "- 🏗 Open Yard VAS\n\n"
         "Let me know and I’ll share the full list of charges!"})
+
    
 # --- Storage Rate Matching ---
     if match([r"open yard.*mussafah"]):
