@@ -1185,7 +1185,7 @@ def chat():
     r"dsv location", r"dsv abu dhabi location", r"where is dsv", r"dsv address", r"main office location", 
     r"where is dsv abu dhabi", r"location of dsv", r"where.*dsv.*located", r"head office address"]):
         return jsonify({"reply":
-        "📍 **DSV Abu Dhabi Location:** M-19, Mussafah Industrial Area, Abu Dhabi, UAE.\n\n📞 +971 2 555 2900"})
+        "📍 **DSV Abu Dhabi Location:** M-19, Mussafah Industrial Area, Abu Dhabi, UAE.\n\n📞 +971 2 555 2900, 🗺️ You can find us on Google Maps here: https://goo.gl/maps/tnFcmydbvdJ9gGLy8"})
 
     # --- Friendly Chat ---
     if match([r"\bhello\b|\bhi\b|\bhey\b|good morning|good evening"]):
