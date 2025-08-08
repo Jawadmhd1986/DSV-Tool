@@ -1529,9 +1529,20 @@ def chat():
 
     if match([r"summer break|midday break|working hours summer|12.*3.*break|uae heat ban|no work afternoon|hot season schedule"]):
         return jsonify({"reply": "DSV complies with UAE summer working hour restrictions. From June 15 to September 15, all outdoor work (including open yard and transport loading) is paused daily between 12:30 PM and 3:30 PM. This ensures staff safety and follows MOHRE guidelines."})
-
-    # --- Simple “who are you / services” ---
     
+    # General VAS prompt if user just says 'vas' / 'vas rates'
+    if match([
+        r"^vas$",
+        r"^vas\s*rates?$",
+        r"^value\s*added\s*services$",
+        r"^value\s*added\s*service$",
+        r"^vas\s*details$"
+    ]):
+        return jsonify({{"reply":
+            "Which VAS do you need?\n\n"
+            "🟦 Type **Standard VAS** for AC/Non-AC/Open Shed\n"
+            "🧪 Type **Chemical VAS** for hazmat/chemicals\n"
+            "🏗 Type **Open Yard VAS** for forklifts/cranes"}})
     # --- VAS: Aggregate / Prompt ---
     if match([
         r"^all\s*vas(?:es)?\s*(rates|list)?$",
@@ -1570,20 +1581,6 @@ def chat():
         "- Mobile Crane (80T): 450 AED/hr\n"
         "- Container Lifting: 250 AED/lift\n"
         "- Container Stripping (20ft): 1,200 AED/hr"}})
-
-    # General VAS prompt if user just says 'vas' / 'vas rates'
-    if match([
-        r"^vas$",
-        r"^vas\s*rates?$",
-        r"^value\s*added\s*services$",
-        r"^value\s*added\s*service$",
-        r"^vas\s*details$"
-    ]):
-        return jsonify({{"reply":
-            "Which VAS do you need?\n\n"
-            "🟦 Type **Standard VAS** for AC/Non-AC/Open Shed\n"
-            "🧪 Type **Chemical VAS** for hazmat/chemicals\n"
-            "🏗 Type **Open Yard VAS** for forklifts/cranes"}})
 
     # FM-200 quick explainer
     if match([r"\bfm\s*-?\s*200\b", r"\bfm200\b"]):
