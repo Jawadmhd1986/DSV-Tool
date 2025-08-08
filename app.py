@@ -62,7 +62,7 @@ def _render_vas(category: str) -> str:
         "chemical": "🧪 Chemical VAS includes:",
         "open_yard": "🏗 Open Yard VAS includes:",
     }.get(category.lower().replace(" ", "_"), "Value Added Services:")
-    return title + "
+        return title + "
 - " + "
 - ".join(lines)
 
