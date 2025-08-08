@@ -167,6 +167,7 @@ def chat():
         text = re.sub(r"\bu\b", "you", text)
         text = re.sub(r"\bur\b", "your", text)
         text = re.sub(r"\br\b", "are", text)
+        text = re.sub(r"how\s*r\s*u", "how are you", text)
         text = re.sub(r"\bpls\b", "please", text)
         text = re.sub(r"\bplz\b", "please", text)
         text = re.sub(r"\bthx\b", "thanks", text)
@@ -244,6 +245,8 @@ def chat():
         text = re.sub(r"\btrnasport\b", "transport", text)
         text = re.sub(r"\bmachineries\b", "machinery", text)
         text = re.sub(r"\bmhe\b", "material handling equipment", text)
+        text = re.sub(r"\breefer\s+tr+ucks?\b", "reefer truck", text)
+        text = re.sub(r"\breefer truck\b", "reefer truck", text)
 
     # --- Container Unit Typos & Variants ---
         text = re.sub(r"\b20feet\b", "20 ft", text)
@@ -1139,10 +1142,14 @@ def chat():
     
     # === Individual Truck Types ===
 
-    if match([r"reefer truck", r"chiller truck", r"cold truck"]):
+    if match([
+    r"reefer truck", r"reefer trucks", r"reefer truk", r"reefer trruck", r"reefer trrucks",
+    r"chiller truck", r"chiller trucks", r"cold truck", r"cold trucks",
+    r"refrigerated truck", r"refrigerated trucks"]):
         return jsonify({"reply":
-        "❄️ **Reefer Truck (chiller/freezer)**: Temperature-controlled vehicle used to transport cold chain goods like food, pharmaceuticals, and chemicals.\n"
-        "DSV reefer trucks (chiller/freezer) operate between +2°C to –22°C and are equipped with GPS and real-time temperature tracking."})
+        "❄️ **Reefer Truck**: Temperature-controlled vehicle used to transport cold chain goods like food, pharmaceuticals, and chemicals.\n"
+        "DSV reefer trucks operate between +2°C to –22°C and are equipped with GPS and real-time temperature tracking."})
+
     if match([r"flatbed", r"flatbed truck", r"what is flatbed", r"flatbed trailer"]):
         return jsonify({"reply":
         "🚛 **Flatbed Truck**: An open platform truck ideal for transporting heavy, oversized, or palletized cargo.\n"
@@ -1347,9 +1354,20 @@ def chat():
             return jsonify({"reply": f"Chamber {chamber} is occupied by {client_name}."})
    
     if match([
-    r"like what", r"such as", r"for example", r"what kind of help", r"what.*can.*you.*help.*with", 
-    r"what.*do.*you.*do", r"what.*things.*you.*can.*do", r"can.*you.*give.*example", r"what.*services.*you.*offer",
-    r"what.*can.*u.*do", r"what.*can.*u.*help", r"what.*you.*provide"]):
+    r"like what", r"such as", r"for example", r"what kind of help",
+    r"what.*can.*you.*help.*with",
+    r"what.*do.*you.*do",
+    r"what.*things.*you.*can.*do",
+    r"can.*you.*give.*example",
+    r"what.*services.*you.*offer",
+    r"what.*can.*u.*do",
+    r"what.*can.*u.*help",
+    r"what.*you.*provide",
+    r"^what\s*services\??$",
+    r"^services\??$",
+    r"\bwhat\s+services\b",
+    r"\bwhat\s*service\??$",
+    r"\bservices\s*(offered|available|provided)?\b"]):
         return jsonify({"reply":
         "Sure! I can help you with:\n\n"
         "📦 Storage rates (Standard, Chemical, Open Yard)\n"
