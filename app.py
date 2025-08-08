@@ -215,7 +215,7 @@ def chat():
         text = re.sub(r"\b6pl\b", "sixth party logistics", text)
 
     # Fleet & vehicle types
-        text = re.sub(r"\breefer\b", "refrigerated truck", text)
+        text = re.sub(r"\breefer truck\b|\bchiller truck\b|\bcold truck\b", "refrigerated truck", text)
         text = re.sub(r"\bchiller\b", "refrigerated truck", text)
         text = re.sub(r"\bcity truck\b", "small truck", text)
         text = re.sub(r"\bev truck\b", "electric truck", text)
@@ -383,7 +383,7 @@ def chat():
     if match([
     r"storage rate[s]?$", r"\brates\b", r"storage", r"storage cost",
     r"how much.*storage", r"quotation.*storage only", r"rates", r"rate",
-    r"pricing of storage", r"cost of storage", r"rate for storage", r"all storage rates"]) and not re.search(r"vas|value added", message):
+    r"pricing of storage", r"cost of storage", r"rate for storage", r"all storage rates"]) and not re.search(r"(vas|value added|reefer|refrigerated truck|truck|trailer|lowbed|flatbed|tipper|box truck)", message):
         return jsonify({"reply": "Which type of storage are you asking about? Standard, Chemicals, or Open Yard?"})
 
 # --- Standard Storage Follow-up ---
@@ -629,7 +629,18 @@ def chat():
         "🔹 **VNA (Very Narrow Aisle)**: 1.95m\n"
         "🔹 **Drive-in Racking**: 2.0m\n\n"
         "These widths are optimized for reach trucks, VNA machines, and efficient space utilization."})
-   
+  
+# Handle short follow-ups like "size", "area", "sqm", "m2", "capacity"
+    if match([r"^size$", r"^area$", r"^sqm$", r"^m2$", r"^capacity$"]):
+        return jsonify({"reply":
+        "📏 **DSV Abu Dhabi warehouse sizes**\n"
+        "- 21K (Mussafah): **21,000 sqm** (main site, 7 chambers)\n"
+        "- M44: **5,760 sqm**\n"
+        "- M45: **5,000 sqm**\n"
+        "- Al Markaz: **12,000 sqm**\n"
+        "- **Total warehouse space** (Abu Dhabi): ~**44,000 sqm**\n"
+        "- **Open yard**: **360,000 sqm**"})
+
 # --- Warehouse Area / Size ---
     if match([
     r"\barea\b", r"warehouse area", r"warehouses area", r"warehouse size", r"warehouses size",
@@ -692,7 +703,16 @@ def chat():
 
     if match([r"dsv warehouse", r"abu dhabi warehouse", r"warehouse facilities"]):
         return jsonify({"reply": "DSV Abu Dhabi has 44,000 sqm of warehouse space across 21K, M44, M45, and Al Markaz. Main site is 21K in Mussafah (21,000 sqm, 7 chambers)."})
-
+# --- What is WMS ---
+    if match([r"what is wms|wms meaning|warehouse management system"]):
+        return jsonify({"reply": "WMS stands for Warehouse Management System. DSV uses INFOR WMS for inventory control, inbound/outbound, and full visibility."})
+    if match([r"\binventory\b", r"inventory management", r"what wms system dsv use", r"inventory control", r"inventory system", r"stock tracking"]):
+        return jsonify({"reply": "DSV uses INFOR WMS to manage all inventory activities. It provides:\n- Real-time stock visibility\n- Bin-level tracking\n- Batch/serial number control\n- Expiry tracking (for pharma/FMCG)\n- Integration with your ERP system"})
+    if match([r"\binfor\b", r"what is infor", r"infor wms", r"who makes wms", r"infor system", r"infor software"]):
+        return jsonify({"reply": 
+        "INFOR is the software provider of the Warehouse Management System (WMS) used by DSV. "
+        "It supports real-time inventory tracking, barcode scanning, inbound/outbound flow, and integration with ERP systems. "
+        "INFOR WMS is known for its scalability, accuracy, and user-friendly interface for warehouse operations."})
     if match([
     r"\bwarehouse\b", r"\bwarehousing\b", r"warehouse info", 
     r"tell me about warehouse", r"warehouse\?"]) and not re.search(r"(area|size|space|temperature|temp|cold|freezer|wms|dsv|location|rack|21k|chamber|operations|facility|facilities)", message):
@@ -768,17 +788,6 @@ def chat():
     # --- DSV Managing Director (MD) ---
     if match([r"\bmd\b|managing director|head of dsv|ceo|boss of dsv|hossam mahmoud"]):
         return jsonify({"reply": "Mr. Hossam Mahmoud is the Managing Director, Road & Solutions and CEO Abu Dhabi. He oversees all logistics, warehousing, and transport operations in the region."})
-
-    # --- What is WMS ---
-    if match([r"what is wms|wms meaning|warehouse management system"]):
-        return jsonify({"reply": "WMS stands for Warehouse Management System. DSV uses INFOR WMS for inventory control, inbound/outbound, and full visibility."})
-    if match([r"\binventory\b", r"inventory management", r"what wms system dsv use", r"inventory control", r"inventory system", r"stock tracking"]):
-        return jsonify({"reply": "DSV uses INFOR WMS to manage all inventory activities. It provides:\n- Real-time stock visibility\n- Bin-level tracking\n- Batch/serial number control\n- Expiry tracking (for pharma/FMCG)\n- Integration with your ERP system"})
-    if match([r"\binfor\b", r"what is infor", r"infor wms", r"who makes wms", r"infor system", r"infor software"]):
-        return jsonify({"reply": 
-        "INFOR is the software provider of the Warehouse Management System (WMS) used by DSV. "
-        "It supports real-time inventory tracking, barcode scanning, inbound/outbound flow, and integration with ERP systems. "
-        "INFOR WMS is known for its scalability, accuracy, and user-friendly interface for warehouse operations."})
 
     # --- Services DSV Provides ---
     if match([
@@ -1052,7 +1061,7 @@ def chat():
         "- 🚛 Flatbed trailers\n"
         "- 📦 Box trucks\n"
         "- 🚚 Double trailers\n"
-        "- ❄️ Refrigerated trucks (chiller/freezer)\n"
+        "- ❄️ s (chiller/freezer)\n"
         "- 🏗 Lowbeds\n"
         "- 🪨 Tippers\n"
         "- 🏙 Small city delivery trucks\n\n"
@@ -1104,12 +1113,13 @@ def chat():
     "Let me know if you'd like clarification on any specific point."})
     
     if match([r"\bfleet\b", r"\bdsv fleet\b",r"\bdsv transportation\b", r"truck fleet", r"transport fleet", r"fleet info"]):
-        return jsonify({"reply": "DSV operates a large fleet in the UAE including:\n- Flatbed trailers\n- Box trucks\n- Double trailers\n- Refrigerated trucks (chiller/freezer)\n- Lowbeds\n- Tippers\n- Small city delivery trucks\nFleet vehicles support all types of transport including full truckload (FTL), LTL, and container movements."})
+        return jsonify({"reply": "DSV operates a large fleet in the UAE including:\n- Flatbed trailers\n- Box trucks\n- Double trailers\n- s (chiller/freezer)\n- Lowbeds\n- Tippers\n- Small city delivery trucks\nFleet vehicles support all types of transport including full truckload (FTL), LTL, and container movements."})
     if match([r"truck types", r"trucks", r"transportation types", r"dsv trucks", r"transport.*available", r"types of transport", r"trucking services"]):
-        return jsonify({"reply": "DSV provides local and GCC transportation using:\n- Flatbeds for general cargo\n- Lowbeds for heavy equipment\n- Tippers for construction bulk\n- Box trucks for secure goods\n- Refrigerated trucks for temperature-sensitive cargo\n- Double trailers for long-haul\n- Vans and city trucks for last-mile delivery."})
+        return jsonify({"reply": "DSV provides local and GCC transportation using:\n- Flatbeds for general cargo\n- Lowbeds for heavy equipment\n- Tippers for construction bulk\n- Box trucks for secure goods\n- s for temperature-sensitive cargo\n- Double trailers for long-haul\n- Vans and city trucks for last-mile delivery."})
+    
     # === Individual Truck Types ===
 
-    if match([r"reefer truck", r"refrigerated truck", r"chiller truck", r"cold truck"]):
+    if match([r"reefer truck", r"", r"chiller truck", r"cold truck"]):
         return jsonify({"reply":
         "❄️ **Reefer Truck**: Temperature-controlled vehicle used to transport cold chain goods like food, pharmaceuticals, and chemicals.\n"
         "DSV reefer trucks operate between +2°C to –22°C and are equipped with GPS and real-time temperature tracking."})
@@ -1209,7 +1219,7 @@ def chat():
     r"flatbed.*ton", r"flatbed.*load", r"flatbed capacity",
     r"double trailer.*ton", r"articulated.*capacity",
     r"box truck.*ton", r"curtainside.*load", r"box truck capacity",
-    r"reefer.*ton", r"refrigerated truck.*capacity", r"chiller truck.*load",
+    r"reefer.*ton", r".*capacity", r"chiller truck.*load",
     r"city truck.*ton", r"1 ton truck", r"3 ton truck",
     r"lowbed.*ton", r"lowbed.*capacity",
     r"tipper.*ton", r"dump truck.*load", r"bulk truck.*ton"]):
@@ -1217,7 +1227,7 @@ def chat():
         "🚛 **Flatbed Truck**: up to 22–25 tons (ideal for general cargo, pallets, containers)\n"
         "🚚 **Double Trailer (Articulated)**: up to 50–60 tons combined (used for long-haul or inter-emirate)\n"
         "📦 **Box Truck / Curtainside**: ~5–10 tons (weather-protected for packaged goods)\n"
-        "❄️ **Refrigerated Truck (Reefer)**: 3–12 tons depending on size (for temperature-sensitive cargo)\n"
+        "❄️ ** (Reefer)**: 3–12 tons depending on size (for temperature-sensitive cargo)\n"
         "🏙 **City Truck (1–3 Ton)**: 1 to 3 tons (last-mile delivery within cities)\n"
         "🏗 **Lowbed Trailer**: up to 60 tons (for heavy equipment and oversized machinery)\n"
         "🪨 **Tipper / Dump Truck**: ~15–20 tons (for bulk cargo like sand, gravel, or construction material)"})
