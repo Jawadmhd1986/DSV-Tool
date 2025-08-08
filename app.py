@@ -1618,13 +1618,13 @@ if match([
             "Ask me about anything related to DSV warehousing, logistics, or transport!"
         })
 
-    if match([
+if match([
         r"who are you", r"who r u", r"who.*you", r"who.*are.*you", r"what.*can.*you.*do",
         r"what can u do", r"what can you help with", r"how can you help", r"can u help", r"what can u help me with",
         r"how u help", r"your purpose", r"your role", r"what do u do", r"what.*can.*you.*answer",
         r"what.*assist.*me.*with", r"what.*can.*u.*assist", r"how.*can.*u.*support", r"what.*you.*do", r"how.*u.*can.*help"
     ]):
-        return jsonify({"reply":
+    return jsonify({"reply":
             "I'm the DSV logistics assistant 🤖 here to help you with:\n\n"
             "- 📦 Storage rates (Standard, Chemical, Open Yard)\n"
             "- 🚛 Transportation options and truck types\n"
