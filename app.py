@@ -138,10 +138,30 @@ def generate():
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.get_json()
-    message = data.get("message", "").lower().strip()
+    raw = data.get("message", "") if data else ""
+    raw = raw if isinstance(raw, str) else str(raw)
 
-    def normalize(text):
-        text = text.lower().strip()
+    # quick reply if the first non-empty line is a short greeting
+    first_line = next((ln.strip() for ln in raw.splitlines() if ln.strip()), "")
+    if re.match(r"^(hi|hello|hey|good (morning|evening))\b", first_line, re.I) and len(first_line.split()) <= 3:
+        return jsonify({"reply": "Hello! I'm here to help with anything related to DSV logistics, transport, or warehousing."})
+
+    # collapse to one line for matching
+    text = " ".join(ln.strip() for ln in raw.splitlines() if ln.strip())
+
+    def normalize(s: str) -> str:
+        s = s.lower().strip()
+        # --- your substitutions below unchanged ---
+        s = re.sub(r"\bu\b", "you", s)
+        s = re.sub(r"\bur\b", "your", s)
+        # ... (keep the rest of your normalize() rules exactly as you have them) ...
+        s = re.sub(r"[^a-z0-9\s\.]", "", s)
+        return s
+
+    message = normalize(text)
+
+    def match(patterns):
+        return any(re.search(p, message) for p in patterns)
 
      # Common chat language
         text = re.sub(r"\bu\b", "you", text)
@@ -1061,7 +1081,7 @@ def chat():
         "- 🚛 Flatbed trailers\n"
         "- 📦 Box trucks\n"
         "- 🚚 Double trailers\n"
-        "- ❄️ s (chiller/freezer)\n"
+        "- ❄️ Reefer trucks (chiller/freezer)\n"
         "- 🏗 Lowbeds\n"
         "- 🪨 Tippers\n"
         "- 🏙 Small city delivery trucks\n\n"
@@ -1119,10 +1139,10 @@ def chat():
     
     # === Individual Truck Types ===
 
-    if match([r"reefer truck", r"", r"chiller truck", r"cold truck"]):
+    if match([r"reefer truck", r"chiller truck", r"cold truck"]):
         return jsonify({"reply":
-        "❄️ **Reefer Truck**: Temperature-controlled vehicle used to transport cold chain goods like food, pharmaceuticals, and chemicals.\n"
-        "DSV reefer trucks operate between +2°C to –22°C and are equipped with GPS and real-time temperature tracking."})
+        "❄️ **Reefer Truck (chiller/freezer)**: Temperature-controlled vehicle used to transport cold chain goods like food, pharmaceuticals, and chemicals.\n"
+        "DSV reefer trucks (chiller/freezer) operate between +2°C to –22°C and are equipped with GPS and real-time temperature tracking."})
     if match([r"flatbed", r"flatbed truck", r"what is flatbed", r"flatbed trailer"]):
         return jsonify({"reply":
         "🚛 **Flatbed Truck**: An open platform truck ideal for transporting heavy, oversized, or palletized cargo.\n"
@@ -1153,7 +1173,7 @@ def chat():
         "- 🏗 Lowbeds for heavy or oversized cargo\n"
         "- 🪨 Tippers for bulk material (sand, gravel, etc.)\n"
         "- 📦 Box trucks for protected cargo\n"
-        "- ❄️ Reefer trucks for temperature-controlled delivery\n"
+        "- ❄️ Reefer trucks (chiller/freezer) for temperature-controlled delivery\n"
         "- 🚚 Double trailers for high-volume long-haul moves\n"
         "- 🏙 Small city trucks for last-mile distribution\n\n"
         "All transport is coordinated by our OCC team in Abu Dhabi with real-time tracking, WMS integration, and documentation support."})
@@ -1392,7 +1412,7 @@ def chat():
         return jsonify({"reply": "You're very welcome! 😊"})
 
     # --- Fallback (never ask to rephrase) ---
-    return jsonify({"reply": "Can you please refrase or try asking again with more detail?"})
+    return jsonify({"reply": "Can you please rephrase or try asking again with more detail?"})
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
