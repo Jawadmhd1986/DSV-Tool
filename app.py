@@ -6,6 +6,156 @@ from datetime import datetime
 
 app = Flask(__name__)
 
+
+
+# =========================
+# Central configuration for rates and VAS (edit here)
+# =========================
+CONFIG = {
+    "wms_monthly_fee_aed": 1500.0,
+    "storage_rates": {
+        "standard": {"ac_cbm_day": 2.5, "non_ac_cbm_day": 2.0, "open_shed_cbm_day": 1.8},
+        "chemical": {"ac_cbm_day": 3.5, "non_ac_cbm_day": 2.7},
+        "open_yard": {"kizad_sqm_year": 125.0, "mussafah_sqm_year": 160.0}
+    },
+    "vas": {
+        "standard": {
+            "In/Out Handling": "20 AED/CBM",
+            "Pallet Loading": "12 AED/pallet",
+            "Documentation": "125 AED/set",
+            "Packing with pallet": "85 AED/CBM",
+            "Inventory Count": "3,000 AED/event",
+            "Case Picking": "2.5 AED/carton",
+            "Sticker Labeling": "1.5 AED/label",
+            "Shrink Wrapping": "6 AED/pallet",
+            "VNA Usage": "2.5 AED/pallet"
+        },
+        "chemical": {
+            "Handling (Palletized)": "20 AED/CBM",
+            "Handling (Loose)": "25 AED/CBM",
+            "Documentation": "150 AED/set",
+            "Packing with pallet": "85 AED/CBM",
+            "Inventory Count": "3,000 AED/event",
+            "Inner Bag Picking": "3.5 AED/bag",
+            "Sticker Labeling": "1.5 AED/label",
+            "Shrink Wrapping": "6 AED/pallet"
+        },
+        "open_yard": {
+            "Forklift (3T–7T)": "90 AED/hr",
+            "Forklift (10T)": "200 AED/hr",
+            "Forklift (15T)": "320 AED/hr",
+            "Mobile Crane (50T)": "250 AED/hr",
+            "Mobile Crane (80T)": "450 AED/hr",
+            "Container Lifting": "250 AED/lift",
+            "Container Stripping (20ft)": "1,200 AED/hr"
+        }
+    }
+}
+
+def _render_vas(category: str) -> str:
+    data = CONFIG["vas"].get(category.lower().replace(" ", "_"), {})
+    if not data:
+        return "No VAS configured for this category."
+    lines = [f"{k}: {v}" for k, v in data.items()]
+    title = {
+        "standard": "🟦 Standard VAS includes:",
+        "chemical": "🧪 Chemical VAS includes:",
+        "open_yard": "🏗 Open Yard VAS includes:",
+    }.get(category.lower().replace(" ", "_"), "Value Added Services:")
+    return title + "
+- " + "
+- ".join(lines)
+
+def _render_all_storage_rates() -> str:
+    sr = CONFIG["storage_rates"]
+    std = sr["standard"]
+    chem = sr["chemical"]
+    yard = sr["open_yard"]
+    return (
+        "**Here are the current DSV Abu Dhabi storage rates:**
+
+"
+        "**📦 Standard Storage:**
+"
+        f"- AC: {std['ac_cbm_day']} AED/CBM/day
+"
+        f"- Non-AC: {std['non_ac_cbm_day']} AED/CBM/day
+"
+        f"- Open Shed: {std['open_shed_cbm_day']} AED/CBM/day
+
+"
+        "**🧪 Chemical Storage:**
+"
+        f"- Chemical AC: {chem['ac_cbm_day']} AED/CBM/day
+"
+        f"- Chemical Non-AC: {chem['non_ac_cbm_day']} AED/CBM/day
+
+"
+        "**🏗 Open Yard Storage:**
+"
+        f"- KIZAD: {yard['kizad_sqm_year']} AED/SQM/year
+"
+        f"- Mussafah: {yard['mussafah_sqm_year']} AED/SQM/year
+
+"
+        "*WMS fee applies to indoor storage unless excluded. For a full quotation, fill out the form.*"
+    )
+
+def _compute_storage_fee(storage_type: str, volume: float, days: int):
+    """Return (rate, unit, rate_unit, storage_fee) using CONFIG."""
+    st = (storage_type or "").lower().strip()
+    sr = CONFIG["storage_rates"]
+    rate = 0.0
+    unit = "CBM"
+    rate_unit = "CBM / DAY"
+    storage_fee = 0.0
+
+    def _day_cost(per_year: float) -> float:
+        return per_year / 365.0
+
+    if st == "ac" or st == "standard ac":
+        rate = float(sr["standard"]["ac_cbm_day"])
+        unit = "CBM"
+        rate_unit = "CBM / DAY"
+        storage_fee = volume * days * rate
+    elif st == "non-ac" or st == "non ac" or st == "standard non-ac" or st == "standard non ac":
+        rate = float(sr["standard"]["non_ac_cbm_day"])
+        unit = "CBM"
+        rate_unit = "CBM / DAY"
+        storage_fee = volume * days * rate
+    elif st == "open shed" or "shed" in st:
+        rate = float(sr["standard"]["open_shed_cbm_day"])
+        unit = "CBM"
+        rate_unit = "CBM / DAY"
+        storage_fee = volume * days * rate
+    elif "chem" in st and "ac" in st:
+        rate = float(sr["chemical"]["ac_cbm_day"])
+        unit = "CBM"
+        rate_unit = "CBM / DAY"
+        storage_fee = volume * days * rate
+    elif "chem" in st and ("non-ac" in st or "non ac" in st):
+        rate = float(sr["chemical"]["non_ac_cbm_day"])
+        unit = "CBM"
+        rate_unit = "CBM / DAY"
+        storage_fee = volume * days * rate
+    elif "kizad" in st:
+        rate = float(sr["open_yard"]["kizad_sqm_year"])
+        unit = "SQM"
+        rate_unit = "SQM / YEAR"
+        storage_fee = volume * days * _day_cost(rate)
+    elif "mussafah" in st:
+        rate = float(sr["open_yard"]["mussafah_sqm_year"])
+        unit = "SQM"
+        rate_unit = "SQM / YEAR"
+        storage_fee = volume * days * _day_cost(rate)
+    else:
+        rate = 0.0
+        unit = "CBM"
+        rate_unit = "CBM / DAY"
+        storage_fee = 0.0
+
+    return round(rate, 2), unit, rate_unit, round(storage_fee, 2)
+
 @app.route("/")
 def index():
     return render_template("form.html")
@@ -29,52 +179,14 @@ def generate():
 
     doc = Document(template_path)
 
-    # Rates / units
-    if storage_type == "AC":
-        rate = 2.5
-        unit = "CBM"
-        rate_unit = "CBM / DAY"
-        storage_fee = volume * days * rate
-    elif storage_type == "Non-AC":
-        rate = 2.0
-        unit = "CBM"
-        rate_unit = "CBM / DAY"
-        storage_fee = volume * days * rate
-    elif storage_type == "Open Shed":
-        rate = 1.8
-        unit = "CBM"
-        rate_unit = "CBM / DAY"
-        storage_fee = volume * days * rate
-    elif storage_type == "Chemicals AC":
-        rate = 3.5
-        unit = "CBM"
-        rate_unit = "CBM / DAY"
-        storage_fee = volume * days * rate
-    elif storage_type == "Chemicals Non-AC":
-        rate = 2.7
-        unit = "CBM"
-        rate_unit = "CBM / DAY"
-        storage_fee = volume * days * rate
-    elif "kizad" in storage_type.lower():
-        rate = 125
-        unit = "SQM"
-        rate_unit = "SQM / YEAR"
-        storage_fee = volume * days * (rate / 365)
-    elif "mussafah" in storage_type.lower():
-        rate = 160
-        unit = "SQM"
-        rate_unit = "SQM / YEAR"
-        storage_fee = volume * days * (rate / 365)
-    else:
-        rate = 0
-        storage_fee = 0
-        unit = "CBM"
-        rate_unit = "CBM / DAY"
+        # Rates / units (centralized)
+    rate, unit, rate_unit, storage_fee = _compute_storage_fee(storage_type, volume, days)
+
 
     storage_fee = round(storage_fee, 2)
     months = max(1, days // 30)
     is_open_yard = "open yard" in storage_type.lower()
-    wms_fee = 0 if is_open_yard or not include_wms else 1500 * months
+    wms_fee = 0 if is_open_yard or not include_wms else float(CONFIG["wms_monthly_fee_aed"]) * months
     total_fee = round(storage_fee + wms_fee, 2)
 
     placeholders = {
@@ -412,25 +524,12 @@ def chat():
         })
 
     # --- All Storage Rates at Once ---
-    if match([
-        r"\ball\b", r"all.*storage.*rates", r"complete.*storage.*rate", r"all.*rate", r"list.*storage.*fees",
+        if match([
+        r"all", r"all.*storage.*rates", r"complete.*storage.*rate", r"all.*rate", r"list.*storage.*fees",
         r"storage.*rate.*overview", r"summary.*storage.*rates",
         r"show.*all.*storage.*charges", r"storage.*rates.*all", r"rates for all storage"
     ]):
-        return jsonify({"reply":
-            "**Here are the current DSV Abu Dhabi storage rates:**\n\n"
-            "**📦 Standard Storage:**\n"
-            "- AC: 2.5 AED/CBM/day\n"
-            "- Non-AC: 2.0 AED/CBM/day\n"
-            "- Open Shed: 1.8 AED/CBM/day\n\n"
-            "**🧪 Chemical Storage:**\n"
-            "- Chemical AC: 3.5 AED/CBM/day\n"
-            "- Chemical Non-AC: 2.7 AED/CBM/day\n\n"
-            "**🏗 Open Yard Storage:**\n"
-            "- KIZAD: 125 AED/SQM/year\n"
-            "- Mussafah: 160 AED/SQM/year\n\n"
-            "*WMS fee applies to indoor storage unless excluded. For a full quotation, fill out the form.*"
-        })
+        return jsonify({"reply": _render_all_storage_rates()})
 
     # --- Storage Rate Initial Question ---
     if match([
@@ -441,8 +540,8 @@ def chat():
         return jsonify({"reply": "Which type of storage are you asking about? Standard, Chemicals, or Open Yard?"})
 
     # --- Standard Storage Follow-ups ---
-    if match([r"^standard$", r"standard storage"]):
-        return jsonify({"reply": "Do you mean Standard AC, Standard Non-AC, or Open Shed?"})
+        if match([r"^standard$", r"standard vas", r"standard value added services", r"standard service"]):
+        return jsonify({"reply": _render_vas("standard")})
 
     if match([r"standard ac", r"ac standard", r"standard ac storage"]):
         return jsonify({"reply": "Standard AC storage is 2.5 AED/CBM/day. Standard VAS applies."})
@@ -460,8 +559,8 @@ def chat():
         return jsonify({"reply": "Open Shed storage is 1.8 AED/CBM/day. Standard VAS applies."})
 
     # --- Chemical Storage Follow-ups ---
-    if match([r"^chemical$", r"chemical storage only"]):
-        return jsonify({"reply": "Do you mean Chemical AC or Chemical Non-AC?"})
+        if match([r"^chemical$", r"chemical vas", r"chemical value added services", r"chemical service"]):
+        return jsonify({"reply": _render_vas("chemical")})
 
     if match([r"chemical ac", r"ac chemical", r"chemical ac storage", r"chemical ac storage rate", r"^chemical ac$"]):
         return jsonify({"reply": "Chemical AC storage is 3.5 AED/CBM/day. Chemical VAS applies."})
@@ -485,8 +584,8 @@ def chat():
         })
 
     # --- Open Yard Storage ---
-    if match([r"^open yard$", r"open yard storage", r"open yard rate", r"open yard storage rate"]):
-        return jsonify({"reply": "Do you mean Open Yard in Mussafah or KIZAD?"})
+        if match([r"^open yard$", r"open yard vas", r"open yard value added services", r"yard vas"]):
+        return jsonify({"reply": _render_vas("open_yard")})
 
     if match([r"open yard mussafah", r"mussafah open yard", r"rate.*mussafah open yard", r"^mussafah$"]):
         return jsonify({"reply": "Open Yard Mussafah storage is **160 AED/SQM/year**. WMS is excluded. For availability, contact Antony Jeyaraj at antony.jeyaraj@dsv.com."})
@@ -495,33 +594,27 @@ def chat():
         return jsonify({"reply": "Open Yard KIZAD storage is **125 AED/SQM/year**. WMS is excluded. For availability, contact Antony Jeyaraj at antony.jeyaraj@dsv.com."})
 
     # --- VAS rates ---
-    if match([
+        if match([
         r"standard vas", r"standard", r"standard value added services", r"normal vas", r"normal value added services",
         r"handling charges", r"pallet charges", r"vas for ac", r"value added services for ac",
         r"vas for non ac", r"value added services for non ac",
         r"vas for open shed", r"value added services for open shed"
     ]):
-        return jsonify({"reply":
-            "Standard VAS includes:\n- In/Out Handling: 20 AED/CBM\n- Pallet Loading: 12 AED/pallet\n- Documentation: 125 AED/set\n- Packing with pallet: 85 AED/CBM\n- Inventory Count: 3,000 AED/event\n- Case Picking: 2.5 AED/carton\n- Sticker Labeling: 1.5 AED/label\n- Shrink Wrapping: 6 AED/pallet\n- VNA Usage: 2.5 AED/pallet"
-        })
+        return jsonify({"reply": _render_vas("standard")})
 
-    if match([
+        if match([
         r"chemical vas", r"chemical value added services",
         r"vas for chemical", r"value added services for chemical",
         r"hazmat vas", r"hazmat value added services",
         r"dangerous goods vas", r"dangerous goods value added services"
     ]):
-        return jsonify({"reply":
-            "Chemical VAS includes:\n- Handling (Palletized): 20 AED/CBM\n- Handling (Loose): 25 AED/CBM\n- Documentation: 150 AED/set\n- Packing with pallet: 85 AED/CBM\n- Inventory Count: 3,000 AED/event\n- Inner Bag Picking: 3.5 AED/bag\n- Sticker Labeling: 1.5 AED/label\n- Shrink Wrapping: 6 AED/pallet"
-        })
+        return jsonify({"reply": _render_vas("chemical")})
 
-    if match([
+        if match([
         r"open yard vas", r"open yard", r"open yard value added services", r"yard equipment",
         r"forklift rate", r"crane rate", r"container lifting", r"yard charges"
     ]):
-        return jsonify({"reply":
-            "Open Yard VAS includes:\n- Forklift (3T–7T): 90 AED/hr\n- Forklift (10T): 200 AED/hr\n- Forklift (15T): 320 AED/hr\n- Mobile Crane (50T): 250 AED/hr\n- Mobile Crane (80T): 450 AED/hr\n- Container Lifting: 250 AED/lift\n- Container Stripping (20ft): 1,200 AED/hr"
-        })
+        return jsonify({"reply": _render_vas("open_yard")})
 
     if match([r"^standard$", r"standard vas", r"standard value added services", r"standard service"]):
         return jsonify({"reply":
@@ -1613,4 +1706,4 @@ def chat():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=bool(int(os.environ.get("FLASK_DEBUG", "0"))))
