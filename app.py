@@ -16,7 +16,7 @@ def generate():
     volume = float(request.form.get("volume", 0))
     days = int(request.form.get("days", 0))
     include_wms = request.form.get("wms", "No") == "Yes"
-    email = request.form.get("email", "")
+    commodity = request.form.get("commodity", "").strip()
     today_str = datetime.today().strftime("%d %b %Y")
 
     # Pick template based on storage_type
@@ -31,45 +31,28 @@ def generate():
 
     # Rates / units
     if storage_type == "AC":
-        rate = 2.5
-        unit = "CBM"
-        rate_unit = "CBM / DAY"
+        rate, unit, rate_unit = 2.5, "CBM", "CBM / DAY"
         storage_fee = volume * days * rate
     elif storage_type == "Non-AC":
-        rate = 2.0
-        unit = "CBM"
-        rate_unit = "CBM / DAY"
+        rate, unit, rate_unit = 2.0, "CBM", "CBM / DAY"
         storage_fee = volume * days * rate
     elif storage_type == "Open Shed":
-        rate = 1.8
-        unit = "CBM"
-        rate_unit = "CBM / DAY"
+        rate, unit, rate_unit = 1.8, "CBM", "CBM / DAY"
         storage_fee = volume * days * rate
     elif storage_type == "Chemicals AC":
-        rate = 3.5
-        unit = "CBM"
-        rate_unit = "CBM / DAY"
+        rate, unit, rate_unit = 3.5, "CBM", "CBM / DAY"
         storage_fee = volume * days * rate
     elif storage_type == "Chemicals Non-AC":
-        rate = 2.7
-        unit = "CBM"
-        rate_unit = "CBM / DAY"
+        rate, unit, rate_unit = 2.7, "CBM", "CBM / DAY"
         storage_fee = volume * days * rate
     elif "kizad" in storage_type.lower():
-        rate = 125
-        unit = "SQM"
-        rate_unit = "SQM / YEAR"
+        rate, unit, rate_unit = 125, "SQM", "SQM / YEAR"
         storage_fee = volume * days * (rate / 365)
     elif "mussafah" in storage_type.lower():
-        rate = 160
-        unit = "SQM"
-        rate_unit = "SQM / YEAR"
+        rate, unit, rate_unit = 160, "SQM", "SQM / YEAR"
         storage_fee = volume * days * (rate / 365)
     else:
-        rate = 0
-        storage_fee = 0
-        unit = "CBM"
-        rate_unit = "CBM / DAY"
+        rate, unit, rate_unit, storage_fee = 0, "CBM", "CBM / DAY", 0
 
     storage_fee = round(storage_fee, 2)
     months = max(1, days // 30)
@@ -88,25 +71,34 @@ def generate():
         "{{WMS_FEE}}": f"{wms_fee:,.2f} AED",
         "{{TOTAL_FEE}}": f"{total_fee:,.2f} AED",
         "{{TODAY_DATE}}": today_str,
+        "{{COMMODITY}}": commodity or "N/A",
     }
 
+    # Replace placeholders even if Word split them across runs
+    def replace_in_paragraph(paragraph, mapping):
+        if not paragraph.runs:
+            return
+        full_text = "".join(run.text for run in paragraph.runs)
+        new_text = full_text
+        for key, val in mapping.items():
+            new_text = new_text.replace(key, val)
+        if new_text != full_text:
+            for run in paragraph.runs:
+                run.text = ""
+            paragraph.runs[0].text = new_text
+
     def replace_placeholders(doc_obj, mapping):
-        # Paragraphs
         for p in doc_obj.paragraphs:
-            for key, val in mapping.items():
-                if key in p.text:
-                    p.text = p.text.replace(key, val)
-        # Tables (cells)
+            replace_in_paragraph(p, mapping)
         for table in doc_obj.tables:
             for row in table.rows:
                 for cell in row.cells:
-                    for key, val in mapping.items():
-                        if key in cell.text:
-                            cell.text = cell.text.replace(key, val)
+                    for p in cell.paragraphs:
+                        replace_in_paragraph(p, mapping)
 
     replace_placeholders(doc, placeholders)
 
-    # Delete blocks bracketed by [TAG] ... [/TAG] — now works in tables too
+    # Delete blocks bracketed by [TAG] ... [/TAG]
     def _delete_block_in_paragraphs(doc_obj, start_tag, end_tag):
         inside = False
         to_delete = []
@@ -150,7 +142,7 @@ def generate():
         _delete_block_in_paragraphs(doc_obj, start_tag, end_tag)
         _delete_block_in_tables(doc_obj, start_tag, end_tag)
 
-    # Remove non-relevant VAS sections
+    # Keep only the relevant VAS section
     if "open yard" in storage_type.lower():
         delete_block(doc, "[VAS_STANDARD]", "[/VAS_STANDARD]")
         delete_block(doc, "[VAS_CHEMICAL]", "[/VAS_CHEMICAL]")
@@ -162,7 +154,7 @@ def generate():
         delete_block(doc, "[VAS_OPENYARD]", "[/VAS_OPENYARD]")
 
     os.makedirs("generated", exist_ok=True)
-    filename_prefix = email.split("@")[0] if email else "quotation"
+    filename_prefix = commodity if commodity else "quotation"
     filename = f"Quotation_{filename_prefix}.docx"
     output_path = os.path.join("generated", filename)
     doc.save(output_path)
@@ -410,27 +402,37 @@ def chat():
             "🟨 **Euro Pallet**:\n- Size: 1.2m × 0.8m\n- Load capacity: ~800 kg\n- Fits **21 pallets per bay**\n\n"
             "Pallets are used for racking, picking, and transport. DSV also offers VAS like pallet loading, shrink wrapping, labeling, and stretch film wrapping for safe handling."
         })
-
-    # --- All Storage Rates at Once ---
+# --- All Storage Rates at Once (catch "all rates") ---
     if match([
-        r"\ball\b", r"all.*storage.*rates", r"complete.*storage.*rate", r"all.*rate", r"list.*storage.*fees",
-        r"storage.*rate.*overview", r"summary.*storage.*rates",
-        r"show.*all.*storage.*charges", r"storage.*rates.*all", r"rates for all storage"
-    ]):
+    r"^all\s+rates?$",
+    r"^all\s+storage\s+rates?$",
+    r"^full\s+rates?$",
+    r"^complete\s+rates?$",
+    r"^show\s*all\s*rates$",
+    r"all.*storage.*rates?",
+    r"complete.*storage.*rates?",
+    r"all.*rates?",
+    r"list.*storage.*fees",
+    r"storage.*rate.*overview",
+    r"summary.*storage.*rates?",
+    r"show.*all.*storage.*charges",
+    r"storage.*rates?.*all",
+    r"rates?\s*for\s*all\s*storage"
+]):
         return jsonify({"reply":
-            "**Here are the current DSV Abu Dhabi storage rates:**\n\n"
-            "**📦 Standard Storage:**\n"
-            "- AC: 2.5 AED/CBM/day\n"
-            "- Non-AC: 2.0 AED/CBM/day\n"
-            "- Open Shed: 1.8 AED/CBM/day\n\n"
-            "**🧪 Chemical Storage:**\n"
-            "- Chemical AC: 3.5 AED/CBM/day\n"
-            "- Chemical Non-AC: 2.7 AED/CBM/day\n\n"
-            "**🏗 Open Yard Storage:**\n"
-            "- KIZAD: 125 AED/SQM/year\n"
-            "- Mussafah: 160 AED/SQM/year\n\n"
-            "*WMS fee applies to indoor storage unless excluded. For a full quotation, fill out the form.*"
-        })
+        "**Here are the current DSV Abu Dhabi storage rates:**\n\n"
+        "**📦 Standard Storage:**\n"
+        "- AC: 2.5 AED/CBM/day\n"
+        "- Non-AC: 2.0 AED/CBM/day\n"
+        "- Open Shed: 1.8 AED/CBM/day\n\n"
+        "**🧪 Chemical Storage:**\n"
+        "- Chemical AC: 3.5 AED/CBM/day\n"
+        "- Chemical Non-AC: 2.7 AED/CBM/day\n\n"
+        "**🏗 Open Yard Storage:**\n"
+        "- KIZAD: 125 AED/SQM/year\n"
+        "- Mussafah: 160 AED/SQM/year\n\n"
+        "*WMS fee applies to indoor storage unless excluded. For a full quotation, fill out the form.*"
+    })
 
     # --- Storage Rate Initial Question ---
     if match([
@@ -493,6 +495,83 @@ def chat():
 
     if match([r"open yard kizad", r"kizad open yard", r"rate.*kizad open yard", r"^kizad$"]):
         return jsonify({"reply": "Open Yard KIZAD storage is **125 AED/SQM/year**. WMS is excluded. For availability, contact Antony Jeyaraj at antony.jeyaraj@dsv.com."})
+ 
+    # General VAS prompt if user just says 'vas' / 'vas rates'
+    if match([
+        r"^vas$",
+        r"^vas\s*rates?$",
+        r"^value\s*added\s*services$",
+        r"^value\s*added\s*service$",
+        r"^vas\s*details$"
+    ]):
+        return jsonify({"reply":
+            "Which VAS do you need?\n\n"
+            "🟦 Type **Standard VAS** for AC/Non-AC/Open Shed\n"
+            "🧪 Type **Chemical VAS** for hazmat/chemicals\n"
+            "🏗 Type **Open Yard VAS** for forklifts/cranes"})
+    
+# --- VAS: Aggregate / Prompt ---
+    if match([
+    r"^all\s*vas(?:es)?\s*(rates|list)?$",
+    r"^give\s*me\s*all\s*vas(?:es)?\s*(rates|list)?$",
+    r"^show\s*all\s*vas(?:es)?",
+    r"^complete\s*vas\s*(rates|list)?$",
+    r"^full\s*vas\s*(rates|list)?$",
+    r"all.*value\s*added\s*services",
+    r"vas.*(full|all|complete).*"
+]):
+        return jsonify({"reply":
+        "**📦 Standard VAS:**\n"
+        "- In/Out Handling: 20 AED/CBM\n"
+        "- Pallet Loading: 12 AED/pallet\n"
+        "- Documentation: 125 AED/set\n"
+        "- Packing with pallet: 85 AED/CBM\n"
+        "- Inventory Count: 3,000 AED/event\n"
+        "- Case Picking: 2.5 AED/carton\n"
+        "- Sticker Labeling: 1.5 AED/label\n"
+        "- Shrink Wrapping: 6 AED/pallet\n"
+        "- VNA Usage: 2.5 AED/pallet\n\n"
+        "**🧪 Chemical VAS:**\n"
+        "- Handling (Palletized): 20 AED/CBM\n"
+        "- Handling (Loose): 25 AED/CBM\n"
+        "- Documentation: 150 AED/set\n"
+        "- Packing with pallet: 85 AED/CBM\n"
+        "- Inventory Count: 3,000 AED/event\n"
+        "- Inner Bag Picking: 3.5 AED/bag\n"
+        "- Sticker Labeling: 1.5 AED/label\n"
+        "- Shrink Wrapping: 6 AED/pallet\n\n"
+        "**🏗 Open Yard VAS:**\n"
+        "- Forklift (3T–7T): 90 AED/hr\n"
+        "- Forklift (10T): 200 AED/hr\n"
+        "- Forklift (15T): 320 AED/hr\n"
+        "- Mobile Crane (50T): 250 AED/hr\n"
+        "- Mobile Crane (80T): 450 AED/hr\n"
+        "- Container Lifting: 250 AED/lift\n"
+        "- Container Stripping (20ft): 1,200 AED/hr"
+    })
+    
+# --- All Storage Rates at Once ---
+    if ("value added services" not in message) and match([
+    r"\ball\s+storage\s+rates?\b",
+    r"\b(all|complete|full)\b.*\bstorage\b.*\brates?\b",
+    r"\bsummary\b.*\bstorage\b.*\brates?\b",
+    r"\blist\b.*\bstorage\b.*\b(fees|rates?)\b",
+    r"\bshow\b.*\ball\b.*\bstorage\b.*\b(charges|rates?)\b",
+]):
+        return jsonify({"reply":
+            "**Here are the current DSV Abu Dhabi storage rates:**\n\n"
+            "**📦 Standard Storage:**\n"
+            "- AC: 2.5 AED/CBM/day\n"
+            "- Non-AC: 2.0 AED/CBM/day\n"
+            "- Open Shed: 1.8 AED/CBM/day\n\n"
+            "**🧪 Chemical Storage:**\n"
+            "- Chemical AC: 3.5 AED/CBM/day\n"
+            "- Chemical Non-AC: 2.7 AED/CBM/day\n\n"
+            "**🏗 Open Yard Storage:**\n"
+            "- KIZAD: 125 AED/SQM/year\n"
+            "- Mussafah: 160 AED/SQM/year\n\n"
+            "*WMS fee applies to indoor storage unless excluded. For a full quotation, fill out the form.*"
+        })
 
     # --- VAS rates ---
     if match([
@@ -848,21 +927,24 @@ def chat():
     if match([r"ch3|chamber 3"]):
         return jsonify({"reply": "Chamber 3 is used by food clients and fast-moving items."})
 
-    if match([r"who.*in.*chamber|who.*in.*ch\d+"]):
-        ch_num = re.search(r"ch(\d+)", message)
+    # --- Chamber Mapping (Unified) ---
+# Place inside the chat() function and fix scope
+    if match([r"\bch\d+\b", r"chamber\s*\d+", r"who.*in.*ch\d+", r"who.*in.*chamber\s*\d+"]):
+        ch_num = re.search(r"ch(?:amber)?\s*(\d+)", message)
+        clients = {
+        1: "Khalifa University",
+        2: "PSN (Federal Authority of Protocol and Strategic Narrative)",
+        3: "Food clients & fast-moving items",
+        4: "MCC, TR, and ADNOC",
+        5: "PSN",
+        6: "ZARA & TR",
+        7: "Civil Defense and the RMS",}
         if ch_num:
             chamber = int(ch_num.group(1))
-            clients = {
-                1: "Khalifa University",
-                2: "PSN",
-                3: "Food clients & fast-moving items",
-                4: "MCC, TR, and ADNOC",
-                5: "PSN",
-                6: "ZARA & TR",
-                7: "Civil Defense and the RMS",
-            }
-            client_name = clients.get(chamber, "unknown")
-            return jsonify({"reply": f"Chamber {chamber} is occupied by {client_name}."})
+            if chamber in clients:
+                return jsonify({"reply": f"Chamber {chamber} is occupied by {clients[chamber]}."})
+            else:
+                return jsonify({"reply": f"I don't have data for Chamber {chamber}."})
 
     # --- Warehouse Occupancy (short) ---
     if match([r"warehouse occupancy|occupancy|space available|any space in warehouse|availability.*storage"]):
@@ -974,6 +1056,29 @@ def chat():
             "📍 **Airport Freezone** – Pharma & healthcare storage\n\n"
             "We handle 2PL, 3PL, 4PL logistics, WMS, VAS, and temperature-controlled storage. Contact +971 2 555 2900 or visit dsv.com."
         })
+# --- General Logistics Overview ---
+    if match([
+    r"\blogistics\b",
+    r"what.*is.*logistics",
+    r"about logistics",
+    r"logistics info",
+    r"tell me about logistics",
+    r"explain logistics",
+    r"what do you know about logistics",
+    r"logistics overview",
+    r"define logistics",
+    r"logistics meaning"
+]):
+        return jsonify({"reply":
+        "**Logistics** refers to the planning, execution, and management of the movement and storage of goods, services, and information from origin to destination.\n\n"
+        "At **DSV Abu Dhabi**, logistics includes:\n"
+        "- 📦 **Warehousing** – AC, Non-AC, Open Yard, and temperature-controlled facilities\n"
+        "- 🚛 **Transportation** – Local & GCC trucking (flatbeds, reefers, lowbeds, box trucks, double trailers, etc.)\n"
+        "- 🧾 **Value Added Services** – Packing, labeling, inventory counts, kitting & assembly\n"
+        "- 🌍 **Global Freight Forwarding** – Air, sea, and multimodal shipments\n"
+        "- 🧠 **4PL & Supply Chain Solutions** – End-to-end management, optimization, and consulting\n\n"
+        "We manage everything from port-to-door, ensuring safety, compliance, and cost efficiency."
+    })
 
     # --- DSV Vision / Mission ---
     if match([
@@ -1527,66 +1632,14 @@ def chat():
     if match([r"adnoc|adnoc project|dsv.*adnoc|oil and gas project|dsv support.*adnoc|logistics for adnoc"]):
         return jsonify({"reply": "DSV has an active relationship with ADNOC and its group companies, supporting logistics for Oil & Gas projects across Abu Dhabi. This includes warehousing of chemicals, fleet transport to remote sites, 3PL for EPC contractors, and marine logistics for ADNOC ISLP and offshore projects. All operations are QHSE compliant and meet ADNOC’s safety and performance standards."})
 
+# FM-200 quick explainer
+    if match([r"\bfm\s*-?\s*200\b", r"\bfm200\b"]):
+        return jsonify({"reply":
+            "🔒 **FM‑200 (HFC‑227ea)** is a clean‑agent fire suppression system used in sensitive areas (like RMS). "
+            "It extinguishes fires quickly by absorbing heat, leaves no residue, and is safe for documents and electronics when applied per design."})
+        
     if match([r"summer break|midday break|working hours summer|12.*3.*break|uae heat ban|no work afternoon|hot season schedule"]):
         return jsonify({"reply": "DSV complies with UAE summer working hour restrictions. From June 15 to September 15, all outdoor work (including open yard and transport loading) is paused daily between 12:30 PM and 3:30 PM. This ensures staff safety and follows MOHRE guidelines."})
-    
-    # General VAS prompt if user just says 'vas' / 'vas rates'
-    if match([
-        r"^vas$",
-        r"^vas\s*rates?$",
-        r"^value\s*added\s*services$",
-        r"^value\s*added\s*service$",
-        r"^vas\s*details$"
-    ]):
-        return jsonify({{"reply":
-            "Which VAS do you need?\n\n"
-            "🟦 Type **Standard VAS** for AC/Non-AC/Open Shed\n"
-            "🧪 Type **Chemical VAS** for hazmat/chemicals\n"
-            "🏗 Type **Open Yard VAS** for forklifts/cranes"}})
-    # --- VAS: Aggregate / Prompt ---
-    if match([
-        r"^all\s*vas(?:es)?\s*(rates|list)?$",
-        r"^give\s*me\s*all\s*vas(?:es)?\s*(rates|list)?$",
-        r"^show\s*all\s*vas(?:es)?",
-        r"^complete\s*vas\s*(rates|list)?$",
-        r"^full\s*vas\s*(rates|list)?$",
-        r"all.*value\s*added\s*services",
-        r"vas.*(full|all|complete).*"
-    ]):
-        return jsonify({{"reply":
-        "**📦 Standard VAS:**\n"
-        "- In/Out Handling: 20 AED/CBM\n"
-        "- Pallet Loading: 12 AED/pallet\n"
-        "- Documentation: 125 AED/set\n"
-        "- Packing with pallet: 85 AED/CBM\n"
-        "- Inventory Count: 3,000 AED/event\n"
-        "- Case Picking: 2.5 AED/carton\n"
-        "- Sticker Labeling: 1.5 AED/label\n"
-        "- Shrink Wrapping: 6 AED/pallet\n"
-        "- VNA Usage: 2.5 AED/pallet\n\n"
-        "**🧪 Chemical VAS:**\n"
-        "- Handling (Palletized): 20 AED/CBM\n"
-        "- Handling (Loose): 25 AED/CBM\n"
-        "- Documentation: 150 AED/set\n"
-        "- Packing with pallet: 85 AED/CBM\n"
-        "- Inventory Count: 3,000 AED/event\n"
-        "- Inner Bag Picking: 3.5 AED/bag\n"
-        "- Sticker Labeling: 1.5 AED/label\n"
-        "- Shrink Wrapping: 6 AED/pallet\n\n"
-        "**🏗 Open Yard VAS:**\n"
-        "- Forklift (3T–7T): 90 AED/hr\n"
-        "- Forklift (10T): 200 AED/hr\n"
-        "- Forklift (15T): 320 AED/hr\n"
-        "- Mobile Crane (50T): 250 AED/hr\n"
-        "- Mobile Crane (80T): 450 AED/hr\n"
-        "- Container Lifting: 250 AED/lift\n"
-        "- Container Stripping (20ft): 1,200 AED/hr"}})
-
-    # FM-200 quick explainer
-    if match([r"\bfm\s*-?\s*200\b", r"\bfm200\b"]):
-        return jsonify({{"reply":
-            "🔒 **FM‑200 (HFC‑227ea)** is a clean‑agent fire suppression system used in sensitive areas (like RMS). "
-            "It extinguishes fires quickly by absorbing heat, leaves no residue, and is safe for documents and electronics when applied per design."}})
 
     if match([
         r"like what", r"such as", r"for example", r"what kind of help",
